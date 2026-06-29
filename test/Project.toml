@@ -1,0 +1,6 @@
+[deps]
+Calculus = "dfd5a24e-f5d9-431d-8566-d266db9d2854"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+julia = "1.10"

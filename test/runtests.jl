@@ -1,15 +1,17 @@
-using DrWatson, Test
-@quickactivate "Calculus"
+using Test
 
-# Here you include files using `srcdir`
-# include(srcdir("file.jl"))
+# Set headless mode for CI before loading module
+ENV["GKSwstype"] = "100"
 
-# Run test suite
+# Load the package
+using Calculus
+
 println("Starting tests")
 ti = time()
 
 @testset "Calculus tests" begin
-    @test 1 == 1
+    include("test_calculus_basics.jl")
+    # add more test files here
 end
 
 ti = time() - ti

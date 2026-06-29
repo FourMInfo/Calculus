@@ -6,8 +6,10 @@
 /data
 /videos
 /plots
-/notebooks
 /_research
+build/  # Generated files from documentation or compilation processes
+/build/
+**/build/
 
 ################################################################################
 #                                    Julia                                     #
@@ -414,3 +416,12 @@ $RECYCLE.BIN/
 
 ## Acknowledgements
 # Many thanks to `https://gitignore.io/`, written and maintained by Joe Blau, which contributed much material to this gitignore file.
+################################################################################
+#                              Miscellaneous                                   #
+################################################################################
+/Manifest.toml
+notebooks/Manifest.toml
+.CondaPkg/
+docs/src/Linear\ Algebra\ Extra/
+docs/src/Linear Algebra Capacities/
+

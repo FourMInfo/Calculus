@@ -1,14 +1,12 @@
 # Calculus
-This is the mandatory `index.md` file that is the homepage of the documentation.
 
-Here the documentation string of a function is expanded:
-```@docs
-dummy_project_function
-```
+Julia calculus study project — derivatives, integrals, limits, series, and applications.
 
-We can link to any subsection name with [Subsection name](@ref).
+## Overview
 
-We can link to documentation strings with [`dummy_project_function`](@ref).
+This documentation covers the mathematical content implemented in the `Calculus` module.
+Content will be expanded as the module develops.
 
-## Subsection name
-Test.
+## Source Repository
+
+[FourMInfo/Calculus](https://github.com/FourMInfo/Calculus) on GitHub.

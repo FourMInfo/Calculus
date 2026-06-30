@@ -1,34 +1,42 @@
 CI = get(ENV, "CI", nothing) == "true" || get(ENV, "GITHUB_TOKEN", nothing) !== nothing
-using DrWatson
-@quickactivate "Calculus"
-using Documenter
-
-# Here you may include files from the source directory
-include(srcdir("dummy_src_file.jl"))
+using Documenter, Dates
+using Calculus
 
 @info "Building Documentation"
 makedocs(;
+    modules=[Calculus],
     sitename = "Calculus",
-    # This argument is only so that the sequence of pages in the sidebar is configured
-    # By default all markdown files in `docs/src` are expanded and included.
+    pagesonly = true,
     pages = [
         "index.md",
     ],
-    # Don't worry about what `CI` does in this line.
-    format = Documenter.HTML(prettyurls = CI),
+    format = Documenter.HTML(
+        prettyurls = CI,
+        edit_link = "main",
+        inventory_version = "0.1.0",
+        mathengine = Documenter.MathJax3(Dict(
+            :loader => Dict("load" => ["[tex]/physics", "[tex]/ams"]),
+            :tex => Dict(
+                "packages" => ["base", "ams", "mathtools"],
+                "inlineMath" => [["\$", "\$"]],
+                "displayMath" => [["\$\$", "\$\$"], ["\\[", "\\]"]],
+            ),
+        )),
+        footer = "Powered by [Documenter.jl](https://documenter.jl) and the [Julia Programming Language](https://julialang.org) generated on $(Dates.format(Dates.now(), "yyyy-mm-dd HH:MM:ss"))"
+    ),
 )
 
 @info "Deploying Documentation"
 if CI
+    # Override to target math_tech_study for cross-repository deployment
+    # DO NOT REMOVE OR CHANGE THIS
+    ENV["GITHUB_REPOSITORY"] = "FourMInfo/math_tech_study"
     deploydocs(
-        # `repo` MUST be set correctly. Once your GitHub name is set
-        # the auto-generated documentation will be hosted at:
-        # https://FourMInfo.github.io/Calculus/dev/
-        # (assuming you have enabled `gh-pages` deployment)
-        repo = "github.com/FourMInfo/Calculus.git",
+        repo = "github.com/FourMInfo/math_tech_study.git",
         target = "build",
         push_preview = true,
         devbranch = "main",
+        dirname = "calculus",
     )
 end
 

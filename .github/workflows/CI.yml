@@ -3,8 +3,10 @@ on:
   push:
     branches:
       - main
-    tags: '*'
+    tags:
+      - '*'
   pull_request:
+  workflow_dispatch:  # Manual trigger for documentation deployment
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: only if it is a pull request build.
@@ -13,6 +15,8 @@ concurrency:
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    # Only run tests on pull requests, skip on pushes to main
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -24,21 +28,110 @@ jobs:
         arch:
           - x64
     steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v5
+      - uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: julia-actions/cache@v1
-      - uses: julia-actions/julia-buildpkg@v1
-
+      - uses: julia-actions/cache@v3
+      - name: Instantiate workspace
+        run: julia --project=. -e 'using Pkg; Pkg.instantiate()'
       - name: Run tests
-        run: >
-          julia --project=. --color=yes test/runtests.jl
+        run: julia --project=. --color=yes -e 'using Pkg; Pkg.test()'
+
+  docs-build:
+    name: Build Documentation
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Check for docs/src changes
+        id: docs-changes
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files: $CHANGED_FILES"
+          if echo "$CHANGED_FILES" | grep -qE '^(src/|docs/)'; then
+            echo "docs_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "docs_changed=false" >> $GITHUB_OUTPUT
+          fi
+      - uses: julia-actions/setup-julia@v3
+        if: steps.docs-changes.outputs.docs_changed == 'true'
+        with:
+          version: '1'
+          arch: x64
+      - uses: julia-actions/cache@v3
+        if: steps.docs-changes.outputs.docs_changed == 'true'
+      - name: Instantiate docs workspace
+        if: steps.docs-changes.outputs.docs_changed == 'true'
+        run: julia --project=docs -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'
+      - name: Build documentation
+        if: steps.docs-changes.outputs.docs_changed == 'true'
+        run: julia --project=docs --color=yes docs/make.jl
+      - name: Skip docs build (no relevant changes)
+        if: steps.docs-changes.outputs.docs_changed == 'false'
+        run: echo "No docs or src changes detected, skipping docs build."
+
+  deploy-docs:
+    name: Deploy Documentation
+    # Only run deployment on pushes to main (after merge) or manual trigger
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0  # Fetch full history for path change detection
+          
+      # Check if documentation-related files have changed
+      - name: Check for documentation changes
+        id: docs-changes
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "Manual trigger - deploying docs"
+            echo "docs_changed=true" >> $GITHUB_OUTPUT
+          else
+            # Check if any documentation-related files changed in the last commit
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+            echo "Changed files: $CHANGED_FILES"
+            
+            # Filter out .github/ directory files and check for documentation-related changes
+            DOC_CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -v '^\.github/' || true)
+            echo "Non-.github files: $DOC_CHANGED_FILES"
+            
+            if [ -n "$DOC_CHANGED_FILES" ] && echo "$DOC_CHANGED_FILES" | grep -qE '(^src/|^docs/|\.md$|Project\.toml$|Manifest\.toml$)'; then
+              echo "Documentation-related files changed - deploying docs"
+              echo "docs_changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "No documentation-related files changed - skipping docs deployment"
+              echo "docs_changed=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+          
+      - name: Setup Julia
+        if: steps.docs-changes.outputs.docs_changed == 'true'
+        uses: julia-actions/setup-julia@v3
+        with:
+          version: '1'
+          arch: x64
+          
+      - uses: julia-actions/cache@v3
+        if: steps.docs-changes.outputs.docs_changed == 'true'
+        continue-on-error: true
+
+      - name: Instantiate docs workspace
+        if: steps.docs-changes.outputs.docs_changed == 'true'
+        run: julia --project=docs -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'
+        continue-on-error: true
 
       - name: Generate documentation and deploy
+        if: steps.docs-changes.outputs.docs_changed == 'true'
+        run: julia --project=docs --color=yes docs/make.jl
         env: # needed for pushing to gh-pages branch
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-        run: >
-          julia --project=. --color=yes docs/make.jl
+          # Configure the subdirectory for this repository
+          DOCUMENTER_DEPLOY_SUBDIRECTORY: "calculus"
+

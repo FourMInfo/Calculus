@@ -9,6 +9,7 @@ makedocs(;
     pagesonly = true,
     pages = [
         "index.md",
+        "sites.md",
     ],
     format = Documenter.HTML(
         prettyurls = CI,

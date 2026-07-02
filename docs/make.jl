@@ -9,6 +9,16 @@ makedocs(;
     pagesonly = true,
     pages = [
         "index.md",
+        "Differential Calculus" => [
+            "Differential_Calculus/01 Derivatives and Rules.md",
+            "Differential_Calculus/02 Applications and Extrema.md",
+            "Differential_Calculus/03 Curve Sketching.md",
+        ],
+        "Integral Calculus" => [
+            "Integral_Calculus/01 Definite Integral.md",
+            "Integral_Calculus/02 Antiderivatives and Main Theorem.md",
+            "Integral_Calculus/03 Integration Techniques.md",
+        ],
         "sites.md",
     ],
     format = Documenter.HTML(

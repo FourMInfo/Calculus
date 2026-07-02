@@ -22,7 +22,7 @@ member environments. Each member has its own `Project.toml` and `Manifest.toml`:
 |---|---|
 | `Project.toml` | Root package — defines `Calculus` as a library (uuid `dfd5a24e-f5d9-431d-8566-d266db9d2854`) |
 | `test/Project.toml` | Test-only deps (`Calculus`, `Test`) — workspace member |
-| `docs/Project.toml` | Docs deps (`Documenter`, `Dates`, `Calculus`) — workspace member; uses `Pkg.develop(path=".")` |
+| `docs/Project.toml` | Docs deps (`Documenter`, `Dates`, `LiveServer`, `Calculus`) — workspace member; uses `Pkg.develop(path=".")`. `LiveServer` is for local live preview (see the `documenter-jl-conventions` skill) |
 | `notebooks/Project.toml` | Notebook superset (`IJulia`, `Revise`, `Calculus`) — **not** a workspace member |
 
 The `notebooks/` environment is intentionally excluded from the workspace `projects` list because

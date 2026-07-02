@@ -50,7 +50,7 @@ See `documenter-jl-conventions` skill for section anchor rules and examples.
 ## Documentation Structure
 
 - **Cross-Repository Deployment**: Deploys to math_tech_study repository
-- **Subdirectory Pattern**: Available at study.fourm.info/calculus/
+- **Subdirectory Pattern**: Available at study.fourm.info/linear_algebra/
 - **Auto-docs Integration**: Uses `@autodocs` for automatic function documentation
 - **Mathematical Notation**: Supports LaTeX rendering in documentation
 
@@ -61,3 +61,5 @@ julia --project=. docs/make.jl
 ```
 
 **IMPORTANT**: Always run `julia --project=. docs/make.jl` after making changes to documentation files in `docs/src/`. This allows the user to preview changes in the browser immediately without running the build manually.
+
+For a live, auto-refreshing preview served from `docs/build/`, use `LiveServer` (declared in `docs/Project.toml`). See the `documenter-jl-conventions` skill for the exact `serve` command.

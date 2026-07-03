@@ -1,5 +1,7 @@
 [deps]
+BlockArrays = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
 IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
+LAlatex = "2feda2f4-7604-459e-bd73-51e960cd9dcb"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 Calculus = "dfd5a24e-f5d9-431d-8566-d266db9d2854"
 

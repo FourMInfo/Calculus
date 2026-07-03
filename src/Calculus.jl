@@ -1,6 +1,6 @@
 module Calculus
 using Reexport
-@reexport using Plots, BlockArrays, LAlatex, LaTeXStrings
+@reexport using Plots, LaTeXStrings
 
 # GR backend — auto-configures for CI or interactive use
 if haskey(ENV, "CI") || get(ENV, "GKSwstype", "") == "100"

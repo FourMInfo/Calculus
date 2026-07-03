@@ -7,8 +7,6 @@ authors = ["Aron T"]
 projects = ["test", "docs"]
 
 [deps]
-BlockArrays = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
-LAlatex = "2feda2f4-7604-459e-bd73-51e960cd9dcb"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"

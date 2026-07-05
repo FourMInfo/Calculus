@@ -14,7 +14,7 @@ The version currently up is a summary created by Claude which has not yet been e
 
 The Calculus package contains one module, [Calculus.jl](https://github.com/FourMInfo/Calculus/blob/main/src/Calculus.jl) which essentially encapsulates and exports all aspects of code contained in this repository. The simplest way to access all its functionality is to use the Julia package manager to add the Github repository (which is open source). Then you can use the command `using Calculus` in your notebook, code or Julia REPL.
 
-## Basic Linear Algebra
+## Basic Calculus
 
 The code for this can be found in the [calculus\_basic.jl](https://github.com/FourMInfo/Calculus/blob/main/src/calculus_basic.jl) file.
 

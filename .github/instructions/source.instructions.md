@@ -10,7 +10,7 @@ All code uses `@reexport` pattern and exports both computational + plotting func
 ```julia
 # Main module uses @reexport for clean interface
 using Reexport
-@reexport using Plots, BlockArrays, LAlatex, LaTeXStrings
+@reexport using CalculusWithJuliaSquared, LaTeXStrings
 
 # Pure computational functions (no plotting dependencies)
 export calculate_derivative, calculate_integral
@@ -19,9 +19,11 @@ export calculate_derivative, calculate_integral
 export plot_function, plot_derivative
 ```
 
+`CalculusWithJuliaSquared` brings `Plots`, `Symbolics`, `Roots`, `LinearAlgebra`, `SpecialFunctions`, and `IntervalSets` with it, plus ready-made calculus utilities and plotting recipes (see the "What CalculusWithJuliaSquared Provides" section in `copilot-instructions.md`). **Check there before writing a new function — it may already exist** (e.g. `riemann_plot`, `plotif`, `tangent`, `lim`).
+
 ## CI/Interactive Detection
 
-Module auto-configures at load time using `GKSwstype`. See the `julia-coding-conventions` skill for the canonical pattern. The check goes in the main module file (`Calculus.jl`) after the `@reexport` block.
+Handled by `CalculusWithJuliaSquared` at its own load time (the canonical `GKSwstype` pattern from the `julia-coding-conventions` skill lives there now). This module needs no GKS configuration of its own.
 
 ## Julia Coding Standards
 
@@ -65,11 +67,9 @@ end
 
 ## Dependencies & Libraries
 
-**Main Dependencies**: Plots, BlockArrays, LAlatex, LaTeXStrings, Reexport, DrWatson
+**Main Dependencies**: CalculusWithJuliaSquared (unregistered, installed by GitHub URL), LaTeXStrings, Reexport
 
 ### Libraries Used
-- **Plots.jl**: For visualization functions
-- **BlockArrays.jl**: For block-structured arrays
-- **LAlatex.jl**: For LaTeX rendering in notebooks
+- **CalculusWithJuliaSquared.jl**: calculus utilities, plotting recipes, and the full reexport chain (Plots, Symbolics, Roots, LinearAlgebra, SpecialFunctions, IntervalSets) — pure Julia, zero Python by design; never add `Plots` or `SymPy` directly here
 - **LaTeXStrings.jl**: For `L"..."` string macro
 - **Reexport.jl**: For `@reexport` clean module interface

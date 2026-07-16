@@ -8,10 +8,21 @@
 
 ### Core Architecture
 
-- **`src/Calculus.jl`**: Main module; uses `@reexport` to re-export `Plots`, `BlockArrays`, `LAlatex`, `LaTeXStrings` — consumers get all exported names with a single `using Calculus`
+- **`src/Calculus.jl`**: Main module; uses `@reexport` to re-export `CalculusWithJuliaSquared` and `LaTeXStrings` — consumers get all exported names with a single `using Calculus`
 - **`test/`**: Tests using `Calculus` and `Test` only — re-exported names are available via `@reexport`, no explicit `using` needed in test files
 - **`docs/`**: Documenter.jl deploying to `https://study.fourm.info/calculus/` (cross-repo to `math_tech_study`)
 - **`notebooks/`**: Jupyter notebooks for exploration (not tested in CI)
+
+### What CalculusWithJuliaSquared Provides
+
+[`CalculusWithJuliaSquared`](https://github.com/FourMInfo/CalculusWithJuliaSquared.jl) is a personal, pure-Julia (zero-Python) fork of `CalculusWithJulia.jl`, installed **from its GitHub URL** (it's unregistered — the Manifest pins `repo-url`, tracking `master`). It reexports `Plots`, `Symbolics`, `Roots`, `LinearAlgebra`, `SpecialFunctions`, and `IntervalSets`, and auto-configures the GR backend for headless CI at load time — so this repo needs **no direct `Plots` dependency and no GKS setup of its own**. Available after `using Calculus`:
+
+- **Plotting recipes**: `plotif`, `trimplot`, `signchart`, `plot_parametric`(`!`), `plot_polar`(`!`), `implicit_plot`(`!`), `vectorfieldplot`(`3d`), `arrow`(`!`), `riemann_plot`(`!`), `newton_plot!`, `plot_implicit_surface`
+- **Calculus utilities**: `riemann` (8 methods), `fubini`, `lim` (limit tables), `sign_chart`, `tangent`, `secant`, `D` and the `f'` prime notation (via ForwardDiff), `unzip`, `rangeclamp`, `const e`
+- **Symbolic math** (pure Julia): `@variables` etc. via Symbolics, plus symbolic `gradient`/`divergence`/`curl` for `Symbolics.Num`; `∇`, `∇⋅`, `∇×` operators work numerically and symbolically
+- **Root finding**: `fzero`/`fzeros` via Roots
+
+To update to a newer CWJS commit: `julia --project=. -e 'using Pkg; Pkg.update("CalculusWithJuliaSquared")'`. Never re-add `Plots`/`SymPy` directly here — plotting comes through CWJS, and CWJS's whole purpose is keeping Python out.
 
 ## Julia Workspace Layout
 

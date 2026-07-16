@@ -15,7 +15,7 @@
 
 ### What CalculusWithJuliaSquared Provides
 
-[`CalculusWithJuliaSquared`](https://github.com/FourMInfo/CalculusWithJuliaSquared.jl) is a personal, pure-Julia (zero-Python) fork of `CalculusWithJulia.jl`, installed **from its GitHub URL** (it's unregistered — the Manifest pins `repo-url`, tracking `master`). It reexports `Plots`, `Symbolics`, `Roots`, `LinearAlgebra`, `SpecialFunctions`, and `IntervalSets`, and auto-configures the GR backend for headless CI at load time — so this repo needs **no direct `Plots` dependency and no GKS setup of its own**. Available after `using Calculus`:
+[`CalculusWithJuliaSquared`](https://github.com/FourMInfo/CalculusWithJuliaSquared.jl) is a personal, pure-Julia (zero-Python) fork of `CalculusWithJulia.jl`. It's **unregistered**, so its GitHub URL is declared in `Project.toml`'s `[sources]` section — required because Manifests are gitignored here, and without `[sources]` a clean clone (e.g. CI) tries the General registry and fails. Keep that section intact. It reexports `Plots`, `Symbolics`, `Roots`, `LinearAlgebra`, `SpecialFunctions`, and `IntervalSets`, and auto-configures the GR backend for headless CI at load time — so this repo needs **no direct `Plots` dependency and no GKS setup of its own**. Available after `using Calculus`:
 
 - **Plotting recipes**: `plotif`, `trimplot`, `signchart`, `plot_parametric`(`!`), `plot_polar`(`!`), `implicit_plot`(`!`), `vectorfieldplot`(`3d`), `arrow`(`!`), `riemann_plot`(`!`), `newton_plot!`, `plot_implicit_surface`
 - **Calculus utilities**: `riemann` (8 methods), `fubini`, `lim` (limit tables), `sign_chart`, `tangent`, `secant`, `D` and the `f'` prime notation (via ForwardDiff), `unzip`, `rangeclamp`, `const e`

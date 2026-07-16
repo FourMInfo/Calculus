@@ -10,12 +10,17 @@ All notebooks should start with the standard setup cell:
 ```julia
 using Revise
 using Calculus
+using LAlatex, BlockArrays
 
 LAlatex.set_backend!(:symbolics)
 LAlatex.reset_display_defaults!()
 ```
 
-`LAlatex`, `BlockArrays`, and `LaTeXStrings` are re-exported by `Calculus`, so no separate `using` is needed. In particular, the `L"..."` string macro is available immediately after `using Linear_Algebra`.
+What comes from where:
+
+- `using Calculus` provides everything the module reexports — `LaTeXStrings` (the `L"..."` macro) plus the full `CalculusWithJuliaSquared` chain (`Plots`, `Symbolics`, `Roots`, calculus utilities and plotting recipes — see "What CalculusWithJuliaSquared Provides" in `copilot-instructions.md`).
+- `LAlatex` and `BlockArrays` are **notebooks-environment dependencies only** (in `notebooks/Project.toml`, not the root project), so they need their own `using` line — they are *not* re-exported by `Calculus`.
+
 `set_backend!(:symbolics)` is required because this package uses Symbolics.jl; the default `:latexify` backend gives worse output for symbolic expressions.
 `reset_display_defaults!()` ensures a clean display state on every kernel restart.
 
@@ -32,11 +37,11 @@ LAlatex.reset_display_defaults!()
 
 - Plots render inline in Jupyter notebooks
 - No need for headless mode configuration
-- Use the same plotting functions from the package (`plot_param_line`, etc.)
+- Prefer the ready-made recipes from `CalculusWithJuliaSquared` (`plotif`, `riemann_plot`, `plot_parametric`, `vectorfieldplot`, …) and this package's own plotting functions before writing new ones
 
 ## LAlatex Display
 
-[LAlatex.jl](https://github.com/ea42gh/LAlatex.jl) (by ea42gh) is re-exported by `Linear_Algebra` and provides clean LaTeX rendering of linear algebra objects in notebooks. Use it instead of raw `println` or `display` whenever presenting mathematical results.
+[LAlatex.jl](https://github.com/ea42gh/LAlatex.jl) (by ea42gh) is available in the notebooks environment (`using LAlatex` in the setup cell) and provides clean LaTeX rendering of mathematical objects in notebooks. Use it instead of raw `println` or `display` whenever presenting mathematical results.
 
 ### Core functions
 

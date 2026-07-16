@@ -1,14 +1,9 @@
 module Calculus
 using Reexport
-@reexport using Plots, LaTeXStrings
-
-# GR backend — auto-configures for CI or interactive use
-if haskey(ENV, "CI") || get(ENV, "GKSwstype", "") == "100"
-    ENV["GKSwstype"] = "100"
-    gr(show=false)
-else
-    gr()
-end
+# CalculusWithJuliaSquared reexports Plots, Symbolics, Roots, LinearAlgebra,
+# SpecialFunctions, and IntervalSets, and auto-configures the GR backend for
+# CI/interactive use at load time — no separate `using Plots` or GKS setup needed.
+@reexport using CalculusWithJuliaSquared, LaTeXStrings
 
 # Pure computational functions (no plotting dependencies)
 

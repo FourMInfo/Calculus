@@ -1,40 +1,58 @@
 # Calculus
 
-This code base is using the [Julia Language](https://julialang.org/) and
-[DrWatson](https://juliadynamics.github.io/DrWatson.jl/stable/)
-to make a reproducible scientific project named
-> Calculus
+A Julia study project covering calculus topics (derivatives, integrals, limits, series, and
+applications), adapted from Guido Walz et al., *Foundations of Mathematics: A Preparatory Course*
+(Springer, 2023).
 
-It is authored by Aron T.
+This repository uses a [Julia](https://julialang.org/) workspace for reproducibility — see
+[Julia Workspace Layout](.github/copilot-instructions.md) in the Copilot instructions for the
+full member/environment breakdown.
 
-To (locally) reproduce this project, do the following:
+## Setup
 
-0. Download this code base. Notice that raw data are typically not included in the
-   git-history and may need to be downloaded independently.
-1. Open a Julia console and do:
-   ```
-   julia> using Pkg
-   julia> Pkg.add("DrWatson") # install globally, for using `quickactivate`
-   julia> Pkg.activate("path/to/this/project")
-   julia> Pkg.instantiate()
+1. Clone this repository.
+2. Instantiate the root environment (library + its production dependencies):
+
+   ```julia
+   julia --project=. -e 'using Pkg; Pkg.instantiate()'
    ```
 
-This will install all necessary packages for you to be able to run the scripts and
-everything should work out of the box, including correctly finding local paths.
+3. Run the tests (uses the `test/` workspace member environment):
 
-You may notice that most scripts start with the commands:
-```julia
-using DrWatson
-@quickactivate "Calculus"
+   ```julia
+   julia --project=. -e 'using Pkg; Pkg.test()'
+   ```
+
+4. Build the documentation locally (uses the `docs/` workspace member environment):
+
+   ```julia
+   julia --project=docs docs/make.jl
+   ```
+
+   The built site is in `docs/build/` — open `docs/build/index.html` in a browser.
+
+### Notebook Setup
+
+`notebooks/` is **not** a workspace member, so `Calculus` is not auto-resolved there.
+After cloning (or after removing `notebooks/Manifest.toml`), run once in the notebooks directory:
+
+```julia-repl
+julia --project=./notebooks
 ```
-which auto-activate the project and enable local path handling from DrWatson.
 
+Then in the REPL Pkg mode (press `]`):
 
+```julia-repl
+pkg> dev ..
+pkg> instantiate
+```
 
-Some documentation has been set up for this project. It can be viewed by
-running the file `docs/make.jl`, and then launching the generated file
-`docs/build/index.html`.
-Alternatively, the documentation may be already hosted online.
-If this is the case it should be at:
+This creates `notebooks/Manifest.toml` (gitignored) with `path = ".."` pointing at the root
+package. Subsequent `julia --project=./notebooks` invocations will resolve
+`Calculus` from the local source.
 
-https://FourMInfo.github.io/Calculus/dev/
+## Documentation
+
+Documentation is deployed cross-repo to the Math & Tech Study Hub:
+
+<https://study.fourm.info/calculus/dev/>

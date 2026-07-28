@@ -99,7 +99,7 @@ end
 - **CI Compatibility**: Plotting tests with environment detection
 - **Comprehensive Coverage**: Test both happy path and edge cases
 - **Type Validation**: Verify return types match expectations
-- **Testing Structure**: Modular test files (`test_linear_algebra_basic.jl`, `test_linear_algebra_transform.jl`)
+- **Testing Structure**: Modular test files (`test_calculus_basics.jl`)
 
 ## Plotting in Tests
 
@@ -121,7 +121,7 @@ CI=true julia --project=. test/runtests.jl
 
 - **Tests**: Run on all PRs (`.github/workflows/CI.yml`)
 - **Docs Build**: Test on PR (no deploy)
-- **Docs Deploy**: Auto-deploy to `https://study.fourm.info/linear_algebra/` on merge to `main`
+- **Docs Deploy**: Auto-deploy to `https://fourm.info/calculus/` on merge to `main`
 - **Cross-Repo**: Deploys to `FourMInfo/math_tech_study` subdirectory
 
 ## CI Considerations

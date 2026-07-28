@@ -4,11 +4,11 @@ This site is one of several documentation sites for my personal math and technol
 
 The main sites can be found at:
 
-- [Main Study Site](https://study.fourm.info/)
+- [Main Study Site](https://fourm.info/)
 - [FourM GitHub Repository](https://github.com/fourm)
 
 Here are some of the key documentation sites related to my mathematics study:
 
-- [Calculus Docs - the current site (this site)](https://study.fourm.info/calculus/)
-- [Linear Algebra Docs](https://study.fourm.info/linear_algebra/)
-- [Math Foundations Docs](https://study.fourm.info/math_foundations/)
+- [Calculus Docs - the current site (this site)](https://fourm.info/calculus/)
+- [Linear Algebra Docs](https://fourm.info/linear_algebra/)
+- [Math Foundations Docs](https://fourm.info/math_foundations/)

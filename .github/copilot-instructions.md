@@ -10,7 +10,7 @@
 
 - **`src/Calculus.jl`**: Main module; uses `@reexport` to re-export `CalculusWithJuliaSquared` and `LaTeXStrings` — consumers get all exported names with a single `using Calculus`
 - **`test/`**: Tests using `Calculus` and `Test` only — re-exported names are available via `@reexport`, no explicit `using` needed in test files
-- **`docs/`**: Documenter.jl deploying to `https://study.fourm.info/calculus/` (cross-repo to `math_tech_study`)
+- **`docs/`**: Documenter.jl deploying to `https://fourm.info/calculus/` (cross-repo to `math_tech_study`)
 - **`notebooks/`**: Jupyter notebooks for exploration (not tested in CI)
 
 ### What CalculusWithJuliaSquared Provides

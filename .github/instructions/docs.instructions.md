@@ -50,7 +50,7 @@ See `documenter-jl-conventions` skill for section anchor rules and examples.
 ## Documentation Structure
 
 - **Cross-Repository Deployment**: Deploys to math_tech_study repository
-- **Subdirectory Pattern**: Available at study.fourm.info/linear_algebra/
+- **Subdirectory Pattern**: Available at fourm.info/calculus/
 - **Auto-docs Integration**: Uses `@autodocs` for automatic function documentation
 - **Mathematical Notation**: Supports LaTeX rendering in documentation
 

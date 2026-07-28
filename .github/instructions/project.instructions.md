@@ -11,17 +11,18 @@ This is **one subrepository** in a multi-repository Julia math study project. Un
 
 ## The Math & Tech Study Hub
 
-The main website lives at **https://study.fourm.info** and is built with:
+The main website lives at **https://fourm.info** and is built with:
 - **Franklin.jl** (Lanyon template) in a separate GitHub repository: `FourMInfo/math_tech_study`
 - The main site handles the top-level domain, navigation, and study guides
 
 Current subrepositories and their deployed URLs:
 | Repository | Deployed URL |
 |---|---|
-| `FourMInfo/Linear_Algebra` | https://study.fourm.info/linear_algebra/ |
-| `FourMInfo/Math_Foundations` | https://study.fourm.info/math_foundations/ |
+| `FourMInfo/Linear_Algebra` | https://fourm.info/linear_algebra/ |
+| `FourMInfo/Math_Foundations` | https://fourm.info/math_foundations/ |
+| `FourMInfo/Calculus` (this repo) | https://fourm.info/calculus/ |
 
-Additional subrepositories (Calculus, etc.) will be added in the future following the same pattern.
+Additional subrepositories will be added in the future following the same pattern.
 
 ## How This Repository Deploys
 
@@ -34,7 +35,7 @@ Push to main
     → CI.yml runs deploy-docs job
     → docs/make.jl builds Documenter site
     → deploydocs() cross-deploys to FourMInfo/math_tech_study (gh-pages branch)
-    → Appears at study.fourm.info/calculus/
+    → Appears at fourm.info/calculus/
 ```
 
 Key facts about `docs/make.jl`:

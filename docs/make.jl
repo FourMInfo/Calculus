@@ -1,14 +1,28 @@
 CI = get(ENV, "CI", nothing) == "true" || get(ENV, "GITHUB_TOKEN", nothing) !== nothing
 using Documenter, Dates
 using Calculus
+# Bring the CalculusWithJuliaSquared module binding into scope so its docstrings can be
+# pulled into an API section here. It ships with the package (Calculus reexports it), so
+# this embeds CWJS's API reference natively in the Calculus site — no cross-repo HTML.
+using Calculus.CalculusWithJuliaSquared
 
 @info "Building Documentation"
 makedocs(;
-    modules=[Calculus],
+    modules=[Calculus, CalculusWithJuliaSquared],
     sitename = "Calculus",
     pagesonly = true,
+    # Keep Calculus's own content strictly checked; tolerate only what the embedded CWJS
+    # autodocs block needs (mirrors CalculusWithJuliaSquared's own docs/make.jl).
+    warnonly = Documenter.except(:autodocs_block),
+    # CWJS is installed as an extracted package tree (no .git), so Documenter can't infer a
+    # remote for its docstrings' "source" links. Point them at the fork's main branch.
+    remotes = Dict(
+        pkgdir(CalculusWithJuliaSquared) =>
+            (Documenter.Remotes.GitHub("FourMInfo", "CalculusWithJuliaSquared.jl"), "main"),
+    ),
     pages = [
         "index.md",
+        "API/CalculusWithJuliaSquared.md",
         "Differential Calculus" => [
             "Differential_Calculus/01 Derivatives and Rules.md",
             "Differential_Calculus/02 Applications and Extrema.md",

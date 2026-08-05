@@ -38,6 +38,7 @@ makedocs(;
     format = Documenter.HTML(
         prettyurls = CI,
         edit_link = "main",
+        assets = ["assets/custom.css"],
         inventory_version = "0.1.0",
         mathengine = Documenter.MathJax3(Dict(
             :loader => Dict("load" => ["[tex]/physics", "[tex]/ams"]),

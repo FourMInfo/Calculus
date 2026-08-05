@@ -1,0 +1,162 @@
+/* Custom styles for cross-site navigation and branding */
+
+@import url('https://fonts.googleapis.com/css?family=Inter:400,500,700');
+
+/* ============================================================
+ * FourM font override
+ *
+ * Inter, chosen 2026-08-04 after live comparison against
+ * Documenter's native default (Lato), Roboto, and Raleway (used
+ * on the Franklin main site) -- pairs well with Raleway there.
+ *
+ * Scoped to body/UI text only -- deliberately does NOT touch:
+ *   - .is-family-monospace / .is-family-code (JuliaMono stack)
+ *     -- changing this would make code unreadable/misaligned.
+ *   - MathJax-rendered math (mjx-container etc.) -- MathJax3
+ *     renders its own fonts independent of page CSS, and
+ *     Documenter's headings don't set their own font-family
+ *     (they inherit from body), so this one override is
+ *     sufficient without a separate heading rule.
+ * ============================================================ */
+body, button, input, optgroup, select, textarea {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+
+/* Site navigation footer styling */
+.site-navigation {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: var(--documenter-dark-background, #f8f9fa);
+    border-radius: 8px;
+    border: 1px solid var(--documenter-dark-border, #e9ecef);
+}
+
+.site-navigation .nav-section {
+    margin-bottom: 1rem;
+}
+
+.site-navigation .nav-section:last-child {
+    margin-bottom: 0;
+}
+
+.site-navigation h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--documenter-dark-text, #212529);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.site-navigation ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.site-navigation ul li {
+    margin: 0.25rem 0;
+}
+
+.site-navigation ul li a {
+    color: var(--documenter-dark-link, #007bff);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+}
+
+.site-navigation ul li a:hover {
+    color: var(--documenter-dark-link-hover, #0056b3);
+    text-decoration: underline;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .site-navigation {
+        background-color: #2b2b2b;
+        border-color: #404040;
+    }
+
+    .site-navigation h4 {
+        color: #ffffff;
+    }
+
+    .site-navigation ul li a {
+        color: #58a6ff;
+    }
+
+    .site-navigation ul li a:hover {
+        color: #79c0ff;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .site-navigation {
+        padding: 1rem;
+    }
+
+    .site-navigation h4 {
+        font-size: 0.9rem;
+    }
+
+    .site-navigation ul li a {
+        font-size: 0.85rem;
+    }
+}
+
+/* Integration with Documenter.jl theme */
+html[data-theme="dark"] .site-navigation {
+    background-color: var(--documenter-dark-background);
+    border-color: var(--documenter-dark-border);
+}
+
+html[data-theme="dark"] .site-navigation h4 {
+    color: var(--documenter-dark-text);
+}
+
+html[data-theme="dark"] .site-navigation ul li a {
+    color: var(--documenter-dark-link);
+}
+
+html[data-theme="dark"] .site-navigation ul li a:hover {
+    color: var(--documenter-dark-link-hover);
+}
+
+/* ============================================================
+ * FourM muted color palette override
+ *
+ * Documenter's default light theme's global link color
+ * (a{color:#2e63b8}) is a saturated blue that reads as "neon"
+ * against the site's grays. Replaces it with the same muted
+ * blue-gray family chosen for the Franklin main site's sidebar
+ * (see math_tech_study/_css/documenter-theme-alignment.css and
+ * desktop-sidebar.css) for whole-domain visual consistency.
+ *
+ * Scope is intentionally narrow: Documenter's headings, sidebar
+ * active-state, and docstring badges are already muted in the
+ * shipped theme and don't need touching -- only the base anchor
+ * color (and the two other selectors below that reuse it) do.
+ * ============================================================ */
+a {
+    color: #4a6b85;
+}
+
+a:hover {
+    color: #2c3e50;
+}
+
+.outdated-warning-overlay a {
+    color: #4a6b85;
+}
+
+#documenter .docs-sidebar form.docs-search > input.is-active {
+    border-color: #4a6b85;
+    box-shadow: 0 0 0 0.125em rgba(74, 107, 133, 0.25);
+}
+
+details.docstring > summary::before {
+    color: #4a6b85;
+}
+
+.content a code {
+    color: #4a6b85;
+}

@@ -10,9 +10,9 @@ _Slope_ is a core concept in working with functions, so it pays to spend a bit o
 
 On a two dimensional graph there are essentially two directions: horizontal and vertical. If we were physically moving in space we could conceptualize the graph as a visual representation of moving forward (or backward) along the horizontal or $x$-axis, and up (or down) along the vertical $y$-axis. You notice I put _backward_ and _down_ in parentheses because which direction we choose to call the positive one does not matter yet — we will see what a _negative_ slope means shortly. Wherever I use up I can use down, and the same for forward and backwards. So let's stick to forward and up in our preliminary discussion.
 
-If we imagine we are moving in space, the way we draw a graph of this motion in space is as follows: For every point $x$ we touch as we move forward, we draw or map a point at the corresponding height $y$ we are moving up to. The graph is one way to represent that motion; a _function_ is another, algebraic and far more convenient. I plug in the current $x$ (horizontal location) into the function and it spits out the $y$ — my current height. Neither one is more fundamental than the other, and that is precisely the great insight behind [analytic geometry](https://fourm.info/linear_algebra/dev/Basics/04%20Analytic%20Geometry/), which should already be familiar to us: Descartes — and, independently, Fermat — saw that geometric curves and algebraic equations are two languages for the same objects. (The modern notion of a _function_ arrived later, with Leibniz and Euler, but it slots straight into their frame.) Graph and function are siblings, each describing our motion in its own dialect.
+If we imagine we are moving in space, the way we draw a graph of this motion is as follows: For every point $x$ we touch as we move forward (_run_), we draw or map a point at the corresponding height $y$ we are moving up to (_rise_). The graph is one way to represent that motion; a _function_ is another—algebraic and far more convenient. I plug in the current $x$ (horizontal location) into the function and it spits out the $y$—my current height. Neither one is more fundamental than the other, and that is precisely the great insight behind [analytic geometry](https://fourm.info/linear_algebra/dev/Basics/04%20Analytic%20Geometry/), which should already be familiar to us: Descartes—and, independently, Fermat—saw that geometric curves and algebraic equations are two languages for the same objects. The modern notion of a _function_ arrived later, with Leibniz and Euler, but it fits straight into their frame. Graph and function are siblings, each describing our motion in its own dialect.
 
-But now I want the answer to a very fundamental question: how far do we move up for each single step we take forward? _That_ ratio — up per forward — is called the _slope_. Note that it is a ratio and not a distance: if I take a step twice as long I rise twice as far, so it is the _comparison_ of the two, and not either one on its own, that tells us anything about the graph. Essentially then, the slope is a graphical representation of rate of change: how much the height $y$ of the graph changes per unit I move horizontally along $x$.
+But now I want the answer to a very fundamental question: how far do we move up for each single step we take forward? _That_ ratio—up (rise) per forward (run)—is called the _slope_. Note that it is a ratio and not a distance: if I take a step twice as long I rise twice as far, so it is the _comparison_ of the two, and not either one on its own, that tells us anything about the graph. Essentially then, the slope is a graphical representation of rate of change: how much the height $y$ of the graph changes per unit I move horizontally along $x$.
 
 We can see this directly. Below is a single straight line along which we take three steps of quite different sizes. The rises differ, the runs differ — but every ratio comes out to the same number, and _that_ number is the slope of the line.
 
@@ -44,7 +44,36 @@ end
 plt # hide
 ```
 
-The _first derivative_ is a function derived from the base function that allows us to compute the slope of the function, in this context the graph's rate of change, for any point $x$ on the graph. The _second derivative_ is the rate of the rate of change in the graph's height. And so we can continue. Of course, as I mentioned earlier slope is the graphical representation of rate of change, so we can just as well talk about rates of change nowhere near a graph. The rate of change of a car's _position_ is its _speed_; the rate of change of its _speed_ is its _acceleration_ — there is a first derivative and a second derivative, in units we all already know. Or think of the news reporting that prices are still rising, but more slowly: that one sentence makes a claim about a first derivative (prices rising) and a second derivative (the rising easing off) at the same time. We could equally talk about the growth of a plant, or the interest accumulating in my bank account, or any rate of change for that matter. The graph is just the representation of these! So if you consider the concept of rate of change more broadly, it should be clear why differential calculus is so useful!
+The _first derivative_ is a function derived from the base function that allows us to compute the slope of the function, in this context the graph's rate of change, for any point $x$ on the graph. The _second derivative_ is the rate of the rate of change in the graph's height. And so we can continue on. Of course, as I mentioned earlier slope is the graphical representation of rate of change, so we can just as well talk about rates of change without using a graph. The rate of change of a car's _position_ is its _speed_; the rate of change of its _speed_ is its _acceleration_ — there is a first derivative and a second derivative, in units we all already know. Or think of the news reporting that prices are still rising, but more slowly: that one sentence makes a claim about a first derivative (prices rising) and a second derivative (the rising easing off) at the same time. We could equally talk about the growth of a plant, or the interest accumulating in my bank account, or any rate of change for that matter. The graph is just the representation of these! So if you consider the concept of rate of change more broadly, it should be clear why differential calculus is so useful!
+
+While we can use functions and descriptive language to talk about rate of change and rate of the rate of change, graphs are also great at helping us visualize these and making this concept more intuitive. For example, the curve below keeps rising—its slope stays positive everywhere—yet the tangent lines drawn along it grow steadily shallower, so the curve rises by less and less. The curve always rising indicates the rate of change is always positive. The gradual decline indicates that the rate of this change is declining. This illustrates what we mean when we say "prices are rising, but easing off."
+
+```@setup slope2
+using Calculus
+
+g(x) = 5 * (1 - exp(-x / 3))          # rises toward 5, but ever more slowly
+gp(x) = (5 / 3) * exp(-x / 3)         # its slope: positive, but shrinking
+xs = range(0, 9, length = 200)
+
+plt = plot(xs, g.(xs);
+    line = (:black, 2), legend = false,
+    xlabel = "x", ylabel = "y",
+    xlims = (0, 9.4), ylims = (0, 5.3),
+    title = "Still rising, but ever more slowly")
+
+for x0 in (1.5, 3.5, 6.5)
+    y0, m = g(x0), gp(x0)
+    hw = 1.2                          # half-width of the drawn tangent segment
+    plot!(plt, [x0 - hw, x0 + hw], [y0 - hw * m, y0 + hw * m]; line = (:royalblue, 2))
+    scatter!(plt, [x0], [y0]; color = :black, markersize = 4)
+    annotate!(plt, x0, y0 + 0.45,
+        text("slope ≈ $(round(m, digits = 2))", 8, :center, :royalblue))
+end
+```
+
+```@example slope2
+plt # hide
+```
 
 From now on, everything we talk about in differential calculus is exactly how we compute the derivatives for any given function. Working with graphs is just the way to concretize these calculations and concepts and make them easier to understand. So we will continue to talk about how to compute the slope.
 
@@ -54,7 +83,7 @@ Before giving the general definition, we compute the derivatives of a few simple
 
 ### Constant Functions
 
-A constant function $f(x) = c$ has a horizontal graph, so its slope is $0$ everywhere.
+A constant function $f(x) = c$ has a horizontal graph, so its slope is $0$ everywhere. To confirm this, note the rise is always 0, so the ratio is $$\frac{f(x+h) - f(x)}{(x+h) - x} = \frac{c - c}{h} = \frac{0}{h} = 0.$$
 
 **First derivative of a constant function.** For $f(x) = c$ the first derivative vanishes for all $x$: $$f'(x) = 0.$$
 

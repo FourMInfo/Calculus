@@ -97,17 +97,97 @@ In particular the _identity_ $f(x) = x$ (with $c = 1$, $d = 0$) has $f'(x) = 1$.
 
 ### The Quadratic Power Function
 
-Imagine a hike through mountainous terrain, modelled as a function $f : \lbrack a, b \rbrack \to \mathbb{R}$ that assigns to each location $x$ a height $f(x)$. The steepness we must overcome depends on _where_ we are: the slope is generally not constant but varies with $x$. These varying slope values are themselves described by a new function, the _first derivative_ of $f$, written $f'$ (read "f dash").
+The previous two function types are exceptional since their slope is constant. Let's look at how most functions work, where the slope changes for each location of $x$.
 
-For $f(x) = x^2$ the slope is _not_ constant. Using the binomial formula, the ratio of the change in value to the change in position between $x$ and $x + h$ is $$\frac{f(x+h) - f(x)}{(x+h) - x} = \frac{(x+h)^2 - x^2}{h} = \frac{2hx + h^2}{h} = 2x + h.$$
+We can see this with the quadratic function $f(x) = x^2$. Its graph is a parabola, and a single glance shows the slope is _not_ constant: near the bottom the curve is almost flat, while further out it climbs ever more steeply. Drawing the tangent line at a few points makes this concrete — shallow where the parabola is nearly flat, steep where it rises sharply. The slope plainly depends on _where_ we are, that is, on the value of $x$.
 
-This ratio still depends on $h$: it is the slope of the [secant line](https://mathworld.wolfram.com/SecantLine.html) through the two points $(x \mid x^2)$ and $(x+h \mid (x+h)^2)$. To obtain the _actual_ slope at $x$ we let $h$ shrink towards $0$ (written $h \to 0$), which sends the secant into the [tangent line](https://mathworld.wolfram.com/TangentLine.html). Taking this [limit](https://mathworld.wolfram.com/Limit.html) gives $$\lim_{h \to 0} (2x + h) = 2x.$$
+```@setup qslope
+using Calculus
 
+q(x) = x^2
+xs = range(-1, 2.7, length = 220)
+
+plt = plot(xs, q.(xs);
+    line = (:black, 2), legend = false,
+    xlabel = "x", ylabel = "y",
+    xlims = (-1.1, 3.1), ylims = (-0.6, 8.6),
+    title = "The slope of x² grows with x")
+
+for x0 in (0.5, 1.5, 2.5)
+    m = 2x0                                  # the slope of x^2 at x0 is 2x0
+    hw = 0.4                                 # half-width of the drawn tangent
+    plot!(plt, [x0 - hw, x0 + hw], [q(x0) - m*hw, q(x0) + m*hw]; line = (:royalblue, 2))
+    scatter!(plt, [x0], [q(x0)]; color = :black, markersize = 4)
+    annotate!(plt, x0 - 0.06, q(x0) + 0.25, text("slope = $(Int(m))", 8, :right, :royalblue))
+end
+```
+
+```@example qslope
+plt # hide
+```
+
+How do we calculate the slope of the parabola at point $x$? Let's take an approximation and imagine two points, $x$ and $x+h$, and using the function $f$ calculate the values on the parabola. If we draw a line between those two calculated points on the parabola, we can use the binomial formula to calculate the slope of the line: the ratio of the change in value to the change in position between $x$ and $x + h$ is $$\frac{f(x+h) - f(x)}{(x+h) - x} = \frac{(x+h)^2 - x^2}{h} = \frac{2hx + h^2}{h} = 2x + h.$$
+
+Of course, the slope of this line is just an approximation. But we have learned the slope is not constant but completely dependent on $x$. So if $x = 1$ the slope will be $2x + h = 2 \times 1 + h = 2 + h$. If $x = 2$ the slope will be $2x + h = 2 \times 2 + h = 4 + h$. And so on. In other words the slope is different for every value of $x$.
+
+The remaining question is how do we get rid of the pesky $h$ and get the _actual_ slope at $x$? Intuitively we can imagine that the smaller $h$ is, the closer the line we create is to the actual slope at point $x$. If we let $h$ get closer and closer to $0$ without ever becoming $0$ we say that $h$ _tends towards_ $0$ (written $h \to 0$). For example, if in the formula $2x + h$ we set $x = 1$ and we set $h$ to consecutively take the values $1/10, 1/100, 1/1000, \dots$ we in turn get the resulting approximations for the slope: $2.1, 2.01, 2.001, \dots$
+
+Following this thought to the end, we say the term $2 + h$ _converges_ to the limit $2$ as $h \to 0$. The mathematical notation for this is:
+
+$$\lim_{h \to 0} (2 + h) = 2,$$
+
+which means the term $2 + h$ is arbitrarily close to the _limit_ (from the Latin _limes_) $2$ whenever $h$ is close enough to $0$. So the actual slope of $f(x) = x^2$ at $x = 1$ is exactly $2$.
+
+The same reasoning works at _any_ point $x$, not just $x = 1$ — we only used $1$ to put numbers on the page. Taking the limit of the general approximation $2x + h$ gives
+
+$$\lim_{h \to 0} (2x + h) = 2x,$$
+
+so the slope of $f(x) = x^2$ at any point is $2x$ — a slope that, just as the graph showed, grows with $x$.
+
+Geometrically, this limiting slope belongs to the straight line that just _touches_ the parabola at $x$ — its _tangent_ line (from the Latin _tangere_, "to touch"). As $h \to 0$, the line drawn through our two points swings around and settles onto that tangent:
+
+```@setup qlimit
+using Calculus
+
+q(x) = x^2
+num(v) = isinteger(v) ? string(Int(v)) : string(v)
+xs = range(0.35, 2.35, length = 220)
+
+plt = plot(xs, q.(xs);
+    line = (:black, 2), legend = false,
+    xlabel = "x", ylabel = "y",
+    xlims = (0.25, 3.35), ylims = (-0.4, 5.9),
+    title = "As h → 0 the line settles onto the tangent")
+
+x0, y0 = 1.0, 1.0
+
+# connecting lines through (x0,y0) and (x0+h, f(x0+h)); slopes 3, 2.5, 2.25 close in on 2
+for h in (1.0, 0.5, 0.25)
+    x1, y1 = x0 + h, q(x0 + h)
+    plot!(plt, [x0, x1], [y0, y1]; line = (:gray45, 1.5, :dash))
+    scatter!(plt, [x1], [y1]; color = :gray25, markersize = 3.5)
+    annotate!(plt, x1 - 0.1, y1 + 0.05, text("slope = $(num(2 + h))", 7, :right, :gray25))
+end
+
+tangent(x) = y0 + 2 * (x - x0)                # the limiting line: slope 2 at x = 1
+plot!(plt, [0.4, 2.2], [tangent(0.4), tangent(2.2)]; line = (:royalblue, 2.5))
+annotate!(plt, 2.25, tangent(2.2) + 0.05, text("tangent, slope = 2", 8, :left, :royalblue))
+
+scatter!(plt, [x0], [y0]; color = :black, markersize = 4.5)
+annotate!(plt, x0, y0 - 0.33, text("x = 1", 8, :center, :black))
+```
+
+```@example qlimit
+plt # hide
+```
+
+Using this idea we can define the first derivative for this specific function as follows:
 **First derivative of the quadratic power function.** For $f(x) = x^2$: $$f'(x) = 2x.$$
+
 
 ### The General Power Function
 
-The same pattern holds for every power $p_i(x) = x^i$ with $i \in \mathbb{N}$: bring the exponent down as a factor and reduce it by one.
+This idea of approximating the slope with a line through two nearby points, then letting those points merge at the limit, is exactly the idea we now turn into the general definition of the derivative. Before explaining the general derivation, let's define the general derivative. The same pattern holds for every power $p_i(x) = x^i$ with $i \in \mathbb{N}$: bring the exponent down as a factor and reduce it by one.
 
 **First derivative of the power function.** For $p_i(x) = x^i$: $$p_i'(x) = i\,x^{i-1}.$$
 

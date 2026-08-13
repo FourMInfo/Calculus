@@ -184,27 +184,49 @@ plt # hide
 Using this idea we can define the first derivative for this specific function as follows:
 **First derivative of the quadratic power function.** For $f(x) = x^2$: $$f'(x) = 2x.$$
 
-
 ### The General Power Function
 
-This idea of approximating the slope with a line through two nearby points, then letting those points merge at the limit, is exactly the idea we now turn into the general definition of the derivative. Before explaining the general derivation, let's define the general derivative. The same pattern holds for every power $p_i(x) = x^i$ with $i \in \mathbb{N}$: bring the exponent down as a factor and reduce it by one.
+Let's now define the derivative for any power function. The same pattern holds for every power $p_i(x) = x^i$ with $i \in \mathbb{N}$: bring the exponent down as a factor and reduce it by one.
 
 **First derivative of the power function.** For $p_i(x) = x^i$: $$p_i'(x) = i\,x^{i-1}.$$
 
-For example $(x^{128})' = 128\,x^{127}$ and $(x^7)' = 7 x^6$. As we will see below, this "rough rule" also extends to negative and fractional exponents.
+For example $(x^{3})' = 3\,x^{2}$ and $(x^7)' = 7 x^6$. As we will see below, this "rough rule" also extends to negative and fractional exponents.
 
 ## The Derivative as a Limit
 
-We now make the procedure above precise for a general function $f$. Fix a point $x$ and a small $h \neq 0$ such that both $x$ and $x + h$ lie in the domain of $f$.
+The idea we used above of approximating the slope with a line through two nearby points, then letting those points merge at the limit, involved quite a bit of hand waving. Ee will now make this idea a bit more precise, although we still will not precisely define the idea of limit. As an aside, if you look at the history of the Calculus, this is exactly how it developed. Both Newton and Leibniz, the founders of modern Calculus, had the intuitive insights and developed the procedures for calculating the derivatives of different types of functions (as we will do below). Making their ideas more precise is what many great mathemeticians did in the eighteenth and Noneteenth centuries. But that is beyond the scope of this basic introduction.
 
-- The [secant line](https://mathworld.wolfram.com/SecantLine.html) of $f$ through $x$ and $x + h$ is the straight line through $(x \mid f(x))$ and $(x+h \mid f(x+h))$.
-- Its slope is the _difference quotient_ $$\frac{f(x+h) - f(x)}{h}.$$
+So let's start by more precisely defining what we mean by a line between two nearby points and the slope of that line in relation to the function $f$. Start by choosing $x$ and a small $h \neq 0$ such that both $x$ and $x + h$ lie in the domain of $f$ (and so are points on the $x$-axis).
 
-The difference quotient is only an _approximation_ to the actual slope at $x$. Passing to the limit $h \to 0$ gives the exact value.
+- The [secant line](https://mathworld.wolfram.com/SecantLine.html) of $f$ through $x$ and $x + h$ is defined as the straight line through the two points $(x, f(x))$ and $(x+h, f(x+h))$.
+- Its slope is the _difference quotient_ which is the ratio of the difference between the two $y$-axis co-ordinates per the difference of the $x$-axis co-ordinates (which difference is, of course, just $h$). This gives us: $$\frac{f(x+h) - f(x)}{h}.$$
 
-**Differential quotient and first derivative.** If the limit of the difference quotients $$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$$ exists, then $f'(x)$ is the value of the slope of $f$ at $x$, called the _first derivative_ of $f$ at $x$. In that case $f$ is said to be _differentiable_ at $x$.
+The difference quotient is only an _approximation_ to the actual slope at $x$. Passing to the limit $h \to 0$ gives the exact value:
 
-**Tangent of $f$ at $x$.** The linear function through $(x \mid f(x))$ with slope $f'(x)$ is the [tangent line](https://mathworld.wolfram.com/TangentLine.html) of $f$ at $x$: $$t(\bar{x}) = f'(x)\,\bar{x} - f'(x)\,x + f(x).$$
+**First derivative.** If this limit of the difference quotients $$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$$ exists, then $f'(x)$ is the value of the slope of $f$ at $x$, called the _first derivative_ of $f$ at $x$. In that case $f$ is said to be _differentiable_ at $x$.
+
+**Tangent of $f$ at $x$.** The linear function $t$ through $(x, f(x))$ with slope $f'(x)$ is the [tangent line](https://mathworld.wolfram.com/TangentLine.html) of $f$ at $x$.
+
+We can derive the function $t$ as follows. The tangent is just a straight line, with two key facts that pin it down:
+
+1. its slope is $f'(x)$, the derivative at the _point of tangency_, and
+2. it passes through the point $(x, f(x))$, i.e. it touches the curve there.
+
+Using the point-slope form of a line — closely related to the [slope-intercept form](https://fourm.info/math_foundations/dev/Algebra/03%20Solving%20Equations/#Standard-Forms) — $y = m \cdot (\bar{x} - x_0) + y_0$, we plug in $m = f'(x)$ and $(x_0, y_0) = (x, f(x))$ to derive $t$:
+
+$$t(\bar{x}) = f'(x)\,(\bar{x} - x) + f(x) = f'(x)\,\bar{x} - f'(x)\,x + f(x).$$
+
+Here $x$ is the _fixed_ point of tangency (a specific number), while $\bar{x}$ is the running input of the tangent line; the bar keeps these two roles of "$x$" apart.
+
+**Example.** Take $f(x) = x^2$, so $f'(x) = 2x$. Substituting into the formula and simplifying:
+
+$$t(\bar{x}) = 2x \cdot \bar{x} - 2x \cdot x + x^2 = 2x\,\bar{x} - 2x^2 + x^2 = 2x\,\bar{x} - x^2.$$
+
+This is still general — $x$ is any point of tangency. To read off a concrete tangent, fix a point, say $x = 1$, where $f(1) = 1$ and $f'(1) = 2$:
+
+$$t(\bar{x}) = 2 \cdot 1 \cdot \bar{x} - 1^2 = 2\bar{x} - 1,$$
+
+the straight line of slope $2$ through $(1, 1)$.
 
 If $f$ is differentiable at _every_ point of its domain, the assignment $x \mapsto f'(x)$ defines a new function, the _derivative function_ (or simply the _derivative_) of $f$.
 

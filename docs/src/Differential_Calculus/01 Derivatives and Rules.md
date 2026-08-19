@@ -4,6 +4,8 @@
 
 The [derivative](https://mathworld.wolfram.com/Derivative.html) is the central tool of differential calculus. Following Walz, _Foundations of Mathematics_, Section 6.1: this section builds the derivative from the intuitive notion of _slope_, gives its precise definition as a limit of difference quotients, and then develops the rules that let us differentiate large classes of functions without returning to that limit each time.
 
+Worked Julia code for this material lives in the companion notes, [Calculus with Julia Squared](https://fourm.info/cwjsn/) — a pure-Julia port of John Verzani's _Calculus with Julia_ — whose [Derivatives](https://fourm.info/cwjsn/derivatives/derivatives.html) chapter follows the same path from secant slope to limit to rules. The sections below link across to it where the two line up.
+
 ## The Slope of a Function
 
 _Slope_ is a core concept in working with functions, so it pays to spend a bit of time trying to understand it. Slope is the graphical stand in for the even more fundamental concept of _rate of change_. What makes differential calculus and its tool, the derivative, so useful is precisely that it allows us to calculate the rate of change of functions (and even the rate of the rate of change and so on!). But let's start with the simpler idea of slope.
@@ -184,6 +186,8 @@ plt # hide
 Using this idea we can define the first derivative for this specific function as follows:
 **First derivative of the quadratic power function.** For $f(x) = x^2$: $$f'(x) = 2x.$$
 
+_In the companion notes:_ the same move from an approximating line to its limit is carried out in code in [The slope of the secant line](https://fourm.info/cwjsn/derivatives/derivatives.html#the-slope-of-the-secant-line) and [The slope of the tangent line](https://fourm.info/cwjsn/derivatives/derivatives.html#the-slope-of-the-tangent-line), where an animation redraws the line for successively smaller $h$ and shows it settling onto the tangent.
+
 ### The General Power Function
 
 Let's now define the derivative for any power function. The same pattern holds for every power $p_i(x) = x^i$ with $i \in \mathbb{N}$: bring the exponent down as a factor and reduce it by one.
@@ -230,6 +234,8 @@ the straight line of slope $2$ through $(1, 1)$.
 
 If $f$ is differentiable at _every_ point of its domain, the assignment $x \mapsto f'(x)$ defines a new function, the _derivative function_ (or simply the _derivative_) of $f$.
 
+_In the companion notes:_ [The derivative](https://fourm.info/cwjsn/derivatives/derivatives.html#the-derivative) states this same limit, and [Some basic derivatives](https://fourm.info/cwjsn/derivatives/derivatives.html#some-basic-derivatives) then puts it to work symbolically — expanding $(x+h)^n - x^n$, cancelling the $h$, and taking the limit with `Symbolics` to recover the power rule.
+
 ## Derivatives of Standard Functions
 
 The limit procedure yields the following derivatives of the standard functions. Each can be derived from the definition using the appropriate limit laws.
@@ -237,6 +243,8 @@ The limit procedure yields the following derivatives of the standard functions. 
 - The [exponential function](https://mathworld.wolfram.com/ExponentialFunction.html) is its own derivative: for $\exp(x) = e^x$, $$\exp'(x) = e^x.$$ The key step uses $\lim_{h \to 0} \dfrac{e^h - 1}{h} = 1$.
 - The sine and cosine functions satisfy $$\sin'(x) = \cos(x), \qquad \cos'(x) = -\sin(x).$$
 - The root function $f(x) = \sqrt{x}$ on an interval $\lbrack a, b \rbrack$ with $a > 0$ has $$f'(x) = \frac{1}{2\sqrt{x}}.$$ Equivalently $(x^{1/2})' = \tfrac{1}{2} x^{-1/2}$, so the power rule extends to fractional exponents.
+
+_In the companion notes:_ [Some basic derivatives](https://fourm.info/cwjsn/derivatives/derivatives.html#some-basic-derivatives) derives $\sin'$, $\log'$ and $\exp'$ from the difference quotient rather than quoting them, and surveys the competing notations — Lagrange's prime, Leibniz's $dy/dx$, Euler's $D$, Newton's dot — for the same object.
 
 ## When Differentiation Fails
 
@@ -250,6 +258,8 @@ Differentiable functions, by contrast, have _smooth_ graphs without kinks or ver
 ## Derivative Rules
 
 Returning to difference quotients for every function is tedious. The following rules let us differentiate combinations of known functions directly.
+
+_In the companion notes:_ [Rules of derivatives](https://fourm.info/cwjsn/derivatives/derivatives.html#rules-of-derivatives) proves each rule and works Julia examples for it — [power](https://fourm.info/cwjsn/derivatives/derivatives.html#power-rule), [sum](https://fourm.info/cwjsn/derivatives/derivatives.html#sum-rule), [product](https://fourm.info/cwjsn/derivatives/derivatives.html#product-rule), [quotient](https://fourm.info/cwjsn/derivatives/derivatives.html#quotient-rule) and [chain](https://fourm.info/cwjsn/derivatives/derivatives.html#chain-rule).
 
 ### Factor Rule
 
@@ -296,3 +306,5 @@ A classic application is the tangent function $\tan(x) = \dfrac{\sin(x)}{\cos(x)
 ## Where This Leads
 
 With these rules we can differentiate essentially every function built from powers, roots, exponentials, and trigonometric functions. The next page, [Applications of Derivatives and Extrema](02 Applications and Extrema.md), uses the first derivative to locate the largest and smallest values of a function and to determine where it rises and falls.
+
+The companion notes carry this same material further: [Higher-order derivatives](https://fourm.info/cwjsn/derivatives/derivatives.html#higher-order-derivatives), and then two chapters on computing derivatives in practice — [Numeric derivatives](https://fourm.info/cwjsn/derivatives/numeric_derivatives.html), on approximate and automatic differentiation, and [Symbolic derivatives](https://fourm.info/cwjsn/derivatives/symbolic_derivatives.html), which builds a small differentiator by walking the expression tree.

@@ -10,7 +10,7 @@ with Julia_ notes onto `Symbolics` / pure Julia:
 
 - The original notes (Python-backed `SymPy`): [Calculus with Julia](https://calculuswithjulia.github.io/), by John Verzani.
 - Our fork, where the port progresses chapter by chapter: [CalculusWithJuliaSquaredNotes.jl](https://github.com/FourMInfo/CalculusWithJuliaSquaredNotes.jl) on GitHub.
-- The rendered ported book — _forthcoming_ at `fourm.info/cwjsn`.
+- The rendered ported book, covering the chapters ported so far: [Calculus with Julia Squared](https://fourm.info/cwjsn/).
 
 ```@autodocs
 Modules = [CalculusWithJuliaSquared]

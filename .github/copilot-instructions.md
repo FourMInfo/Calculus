@@ -22,7 +22,7 @@
 - **Symbolic math** (pure Julia): `@variables` etc. via Symbolics, plus symbolic `gradient`/`divergence`/`curl` for `Symbolics.Num`; `∇`, `∇⋅`, `∇×` operators work numerically and symbolically
 - **Root finding**: `fzero`/`fzeros` via Roots
 
-To update to a newer CWJS commit: `julia --project=. -e 'using Pkg; Pkg.update("CalculusWithJuliaSquared")'`. Never re-add `Plots`/`SymPy` directly here — plotting comes through CWJS, and CWJS's whole purpose is keeping Python out.
+To update to a newer CWJS commit: `julia --project=. -e 'using Pkg; Pkg.update("CalculusWithJuliaSquared")'` — **but first widen `[compat] CalculusWithJuliaSquared` in `Project.toml` to admit the new version, or that command silently does nothing.** Manifests are gitignored here, so the compat bound is the only thing pinning a version, and when it is too tight nothing errors: the resolver just keeps the old release and the new API is simply absent. That is how this repo sat on v0.5.2 from CWJS v0.6.0 through v0.7.0, with `symlim`/`tlim` invisible to `using Calculus` and missing from the published API docs — no error, no symptom beyond a function that "should exist" not existing. Each CWJS `0.x` minor is breaking in Julia's SemVer, so the bound needs the edit *every* release. Useful side effect: `Project.toml` is in the path filter that triggers the docs deploy, so the same one-line bump both fixes resolution and republishes the API page. Never re-add `Plots`/`SymPy` directly here — plotting comes through CWJS, and CWJS's whole purpose is keeping Python out.
 
 ## Julia Workspace Layout
 

@@ -1,9 +1,11 @@
 module Calculus
 using Reexport
 # CalculusWithJuliaSquared reexports Plots, Symbolics, Roots, LinearAlgebra,
-# SpecialFunctions, and IntervalSets, and auto-configures the GR backend for
-# CI/interactive use at load time — no separate `using Plots` or GKS setup needed.
-@reexport using CalculusWithJuliaSquared, LaTeXStrings
+# SpecialFunctions, IntervalSets and LaTeXStrings, and auto-configures the GR backend
+# for CI/interactive use at load time — no separate `using Plots`, `using LaTeXStrings`
+# or GKS setup needed. LaTeXStrings moved into it in v0.12.0; until then this line had to
+# name it alongside, which is precisely what made the gap visible.
+@reexport using CalculusWithJuliaSquared
 
 # Pure computational functions (no plotting dependencies)
 

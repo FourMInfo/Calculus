@@ -14,6 +14,12 @@ makedocs(;
     # Keep Calculus's own content strictly checked; tolerate only what the embedded CWJS
     # autodocs block needs (mirrors CalculusWithJuliaSquared's own docs/make.jl).
     warnonly = Documenter.except(:autodocs_block),
+    # No doctests here: the only ones are CWJS's docstring examples, and each starts with
+    # `using CalculusWithJuliaSquared`, which this env cannot load by name (CWJS comes in
+    # through Calculus) -- they failed on every build. CWJS's own test suite runs them.
+    # To re-enable (planned when chapter 2's docs are revisited), first add CWJS as a
+    # direct dependency of docs/Project.toml.
+    doctest = false,
     # CWJS is installed as an extracted package tree (no .git), so Documenter can't infer a
     # remote for its docstrings' "source" links. Point them at the fork's main branch.
     remotes = Dict(

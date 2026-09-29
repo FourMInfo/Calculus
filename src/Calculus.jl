@@ -11,6 +11,6 @@ using Reexport
 
 # Integrated plotting functions (computation + visualization)
 
-# include("calculus_basics.jl")  # uncomment when source file exists
+# include("calculus_basic.jl")  # uncomment once the first functions are written
 
 end # module

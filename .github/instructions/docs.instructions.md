@@ -3,6 +3,11 @@ applyTo: 'docs/**'
 ---
 # Documentation Conventions
 
+This file is **shared**: copied unchanged into every math study repo from the hub
+(`FourMInfo/math_tech_study`, `project_resources/instructions/`) and byte-identical everywhere.
+This repo's deployed URL (`dirname`) and anything specific to its docs are in
+`project.instructions.md`.
+
 ## Structure for Mathematical Concept Documentation
 
 Documentation in `docs/src/` explains general math concepts (not code). Follow these patterns:
@@ -20,7 +25,7 @@ Documentation in `docs/src/` explains general math concepts (not code). Follow t
 - **Multiple representations**: Equations, tables, visual aids (SVG diagrams when helpful)
 - **Context matters**: Explain _why_ concepts are important, not just _what_ they are
   - Example: "Projections are fundamental to least-squares approximation, computer graphics, and data compression"
-- **Derivations**: Show mathematical reasoning step-by-step (see projection and transformation matrix derivations)
+- **Derivations**: Show mathematical reasoning step-by-step
 
 ## Mathematical Notation, MathJax3 & MathWorld Links
 
@@ -50,16 +55,19 @@ See `documenter-jl-conventions` skill for section anchor rules and examples.
 ## Documentation Structure
 
 - **Cross-Repository Deployment**: Deploys to math_tech_study repository
-- **Subdirectory Pattern**: Available at fourm.info/calculus/
+- **Subdirectory Pattern**: Available at `fourm.info/<dirname>/` — this repo's dirname is in `project.instructions.md`
 - **Auto-docs Integration**: Uses `@autodocs` for automatic function documentation
 - **Mathematical Notation**: Supports LaTeX rendering in documentation
 
 ## Building Documentation
 
 ```bash
-julia --project=. docs/make.jl
+# Once after cloning (docs/Manifest.toml is gitignored) — the same step CI runs
+julia --project=docs -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'
+
+julia --project=docs docs/make.jl
 ```
 
-**IMPORTANT**: Always run `julia --project=. docs/make.jl` after making changes to documentation files in `docs/src/`. This allows the user to preview changes in the browser immediately without running the build manually.
+**IMPORTANT**: Always run `julia --project=docs docs/make.jl` after making changes to documentation files in `docs/src/`. This allows the user to preview changes in the browser immediately without running the build manually.
 
 For a live, auto-refreshing preview served from `docs/build/`, use `LiveServer` (declared in `docs/Project.toml`). See the `documenter-jl-conventions` skill for the exact `serve` command.

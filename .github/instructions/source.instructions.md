@@ -3,73 +3,81 @@ applyTo: 'src/**'
 ---
 # Source Code Conventions
 
+This file is **shared**: copied unchanged into every math study repo from the hub
+(`FourMInfo/math_tech_study`, `project_resources/instructions/`) and byte-identical everywhere.
+This repo's module name, file layout, dependencies, function catalogue and conventions specific
+to its subject are in `project.instructions.md` — read it before editing `src/`.
+
 ## Module Structure & Exports
 
-All code uses `@reexport` pattern and exports both computational + plotting functions:
+The main module (`src/<Package>.jl`) uses `@reexport`, so that `using <Package>` alone gives
+notebooks, tests and docs everything they need, and it exports every public function:
 
 ```julia
-# Main module uses @reexport for clean interface
+module MyPackage
 using Reexport
-@reexport using CalculusWithJuliaSquared, LaTeXStrings
+@reexport using Plots, Symbolics, LaTeXStrings   # this repo's list: project.instructions.md
 
 # Pure computational functions (no plotting dependencies)
-export calculate_derivative, calculate_integral
-
+export calculate_something
 # Integrated plotting functions (computation + visualization)
-export plot_function, plot_derivative
+export plot_something
+
+include("mypackage_basic.jl")
+end
 ```
 
-`CalculusWithJuliaSquared` brings `Plots`, `Symbolics`, `Roots`, `LinearAlgebra`, `SpecialFunctions`, and `IntervalSets` with it, plus ready-made calculus utilities and plotting recipes (see the "What CalculusWithJuliaSquared Provides" section in `copilot-instructions.md`). **Check there before writing a new function — it may already exist** (e.g. `riemann_plot`, `plotif`, `tangent`, `lim`).
+- **Always export new public functions** from the main module.
+- Keep `export` lines grouped by the two categories below, with a comment heading each.
 
-## CI/Interactive Detection
+## Headless Plotting
 
-Handled by `CalculusWithJuliaSquared` at its own load time (the canonical `GKSwstype` pattern from the `julia-coding-conventions` skill lives there now). This module needs no GKS configuration of its own.
+Tests set `ENV["GKSwstype"] = "100"` **before** loading the package (see
+`testing.instructions.md`). Where a module configures the GR backend itself at load time, it
+follows the canonical pattern in the `julia-coding-conventions` skill;
+`project.instructions.md` says which applies here.
 
-## Julia Coding Standards
+## Separate Computation from Plotting
 
-### Function Design Pattern
+Every plotted result has a pure computational function underneath it:
 
 ```julia
 # Pure computational function (no plotting dependencies)
-function calculate_derivative(f, x; h=1e-7)
-    return (f(x + h) - f(x - h)) / (2h)
+function calculate_something(args...)
+    # ... mathematics only; errors here are real errors
+    return result
 end
 
 # Integrated plotting function (computation + visualization)
-function plot_derivative(f, a, b; n=200)
-    xs = range(a, b, length=n)
-    ys = [calculate_derivative(f, x) for x in xs]
+function plot_something(args...)
+    result = calculate_something(args...)
     try
-        plot!(xs, ys)
+        plot!(result)
     catch e
         !haskey(ENV, "CI") && @warn "Plotting failed: $e"
     end
-    return ys
+    return result
 end
 ```
 
-### General Coding Standards
-1. Always export new functions in the main module
-2. Separate pure computational logic from plotting — `calculate_*` functions have no Plots dependency
-3. Plotting functions wrap computation with a try/catch for CI compatibility
-4. Use clear parameter naming consistent with standard calculus notation
-5. Document mathematical definitions and notation in docstrings
+- `calculate_*` functions have no plotting dependency and are tested directly.
+- `plot_*` functions call the computational function, wrap only the plotting in `try`/`catch`,
+  and return the computed result so tests can check it.
+- How a plotting function should return and display its figure is covered by the
+  `julia-figure-authoring` skill.
 
-### Function Categories
-- **Differentiation**: Derivatives, partial derivatives, gradients
-- **Integration**: Definite/indefinite integrals, numerical methods
-- **Limits**: Numerical limit evaluation
-- **Series**: Taylor series, convergence
+## Naming
 
-### Function Naming Patterns
-- **Computational**: `calculate_*` (e.g., `calculate_derivative`, `calculate_integral`)
-- **Plotting**: `plot_*` (e.g., `plot_function`, `plot_tangent`)
+- **Computational**: `calculate_*`; **plotting**: `plot_*`
+- Descriptive suffixes for families of functions (e.g. `_matrix`, `_line`, `_roots`)
+- `_symbolic` variants where a function has both a symbolic and a numeric form
+- Parameter names follow standard mathematical notation (`θ` for angles, `v`/`w` for vectors,
+  `p`/`q` for points, `f` for functions); Unicode names are welcome
 
-## Dependencies & Libraries
+## Documentation & Comments
 
-**Main Dependencies**: CalculusWithJuliaSquared (unregistered, installed by GitHub URL), LaTeXStrings, Reexport
-
-### Libraries Used
-- **CalculusWithJuliaSquared.jl**: calculus utilities, plotting recipes, and the full reexport chain (Plots, Symbolics, Roots, LinearAlgebra, SpecialFunctions, IntervalSets) — pure Julia, zero Python by design; never add `Plots` or `SymPy` directly here
-- **LaTeXStrings.jl**: For `L"..."` string macro
-- **Reexport.jl**: For `@reexport` clean module interface
+- Every exported function has a docstring; the `documenter-jl-conventions` skill covers
+  signature lines, LaTeX in docstrings and `@autodocs`
+- Explain the mathematics in comments: the concept, the formula, and any convention a caller
+  could get wrong (degrees vs radians, orientation, domain restrictions)
+- Keep notation consistent with the repo's `docs/src/` pages

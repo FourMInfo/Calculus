@@ -3,130 +3,86 @@ applyTo: 'test/**'
 ---
 # Testing Conventions
 
-## CI Testing Strategy
+This file is **shared**: copied unchanged into every math study repo from the hub
+(`FourMInfo/math_tech_study`, `project_resources/instructions/`) and byte-identical everywhere.
+This repo's package name, test files and subject-specific testing notes are in
+`project.instructions.md`. How to design tests that can actually catch a defect is covered by
+the `test-design-discipline` skill.
 
-The CI testing strategy consists of three components:
+## Test Setup
 
-### 1. Module-Level Headless Detection
-Configured in the main module (`Linear_Algebra.jl`) at load time. See `julia-coding-conventions` skill for the canonical GKSwstype pattern.
+`test/runtests.jl` sets headless plotting **before** loading the package, loads it with a plain
+`using` (the module reexports its dependencies — no `@quickactivate`), then includes one file per
+topic inside a single top-level `@testset`:
 
-### 2. Manual GKS Configuration in Tests
-Set `ENV["GKSwstype"] = "100"` in test files before loading the module:
 ```julia
-# In test files - Configure headless mode before loading module
-ENV["GKSwstype"] = "100"  # Force headless plotting for CI
-using DrWatson, Test
-@quickactivate "Calculus"
-using Calculus
-```
+using Test
 
-### 3. Separated Computational/Plotting Logic with Robust Testing
-- **Pure computational functions** (`calculate_*`): Test mathematical logic directly, no try-catch
-- **Plotting functions** (`plot_*`): Test with try-catch fallback for CI compatibility
-- **Integration testing**: Verify both computation and visualization work together
+# Set headless mode for CI before loading module
+ENV["GKSwstype"] = "100"
 
-## Test Setup (Uses @quickactivate)
-```julia
-# Tests use DrWatson @quickactivate pattern
-using DrWatson, Test
-@quickactivate "Calculus"
-# Load the Calculus package
-using Calculus
-```
+using MyPackage
 
-## CI-Compatible Plotting Pattern
-```julia
-# Environment detection for plotting tests
-if get(ENV, "CI", "false") == "true" || get(ENV, "GITHUB_ACTIONS", "false") == "true"
-    # In CI, just test that the function exists
-    @test hasmethod(plot_param_line, (typeof(p), typeof(q), Int64))
-else
-    # Local testing - allow plotting but capture any display issues
-    try
-        points = plot_param_line(p, q, 3)
-        # ... test plotting results
-    catch e
-        # Graceful fallback for plotting failures
-        @test hasmethod(plot_param_line, (typeof(p), typeof(q), Int64))
-    end
+@testset "MyPackage tests" begin
+    include("test_mypackage_basic.jl")
 end
 ```
 
-## Testing Patterns
+- Test files are named `test_<topic>.jl`, one per source file or topic, and **every** test file
+  must be `include`d from `runtests.jl` — an orphaned file silently never runs (see the
+  `julia-coding-conventions` skill).
+- Test-only dependencies go in `test/Project.toml`.
 
-- **Comprehensive Coverage**: Test coverage includes all mathematical functions
-- **CI-Safe**: Plotting tests work in both local and headless environments
-- **Edge Cases**: Test mathematical edge cases (orthogonal vectors, zero angles, etc.)
-- **Type Testing**: Verify return types (Point2f, AbstractVector, matrices)
-- **Numerical Precision**: Use `atol=1e-10` for floating-point comparisons
-- Use `@test_throws` for expected errors, `@test_broken` for known failures
+## Separate Computational and Plotting Tests
 
-## CI-Compatible Testing Pattern
-
-Separate computational logic from plotting, test math directly without try-catch, only use try-catch for visualization:
+Mirror the source split: test the mathematics directly, and fence off only the display.
 
 ```julia
-# Test computational logic directly (NO try-catch - mathematical errors should fail)
-@testset "Pure Computational Tests" begin
-    points = calculate_param_line(p, q, 3)
-    @test length(points) == 3
-    @test typeof(points) == Vector{Point2f}
-    # Test mathematical correctness without plotting dependencies
+# Computational logic: NO try/catch — a mathematical error must fail the test
+@testset "Computation" begin
+    result = calculate_something(args...)
+    @test result ≈ expected atol=1e-10
 end
 
-# Test integration (plotting + computation) with CI-safe fallback
-@testset "Integration Tests" begin
+# Plotting: the computation still must be right; only display failures are tolerated
+@testset "Plotting" begin
     try
-        # Test the plotting function (includes computation + visualization)
-        result = plot_param_line(p, q, 3)
-        @test typeof(result) == Vector{Point2f}
-        @test length(result) == 3
+        result = plot_something(args...)
+        @test result ≈ expected atol=1e-10
     catch e
-        # Only catch plotting-related errors, not computational errors
         if contains(string(e), "display") || contains(string(e), "GKS") || isa(e, ArgumentError)
-            @test hasmethod(plot_param_line, (Point2f, Point2f, Int64))
+            @test hasmethod(plot_something, typeof.(args))
         else
-            # Re-throw computational errors - these should fail the test
             rethrow(e)
         end
     end
 end
 ```
 
-## Test Organization
+## Testing Patterns
 
-- **Grouped by Category**: Basic functions, transformation matrices, line geometry, advanced functions
-- **CI Compatibility**: Plotting tests with environment detection
-- **Comprehensive Coverage**: Test both happy path and edge cases
-- **Type Validation**: Verify return types match expectations
-- **Testing Structure**: Modular test files (`test_calculus_basics.jl`)
-
-## Plotting in Tests
-
-- If saving plots, use timestamped paths: `"plots/" * Dates.format(now(),"yyyymmdd-HHMMSS") * "functionname.png"`
-- Ensure `plots/` directory exists before running tests that save plots
-- Use LaTeX titles where appropriate: `title!(L"Plot\ Title")`
+- Cover every exported function, the happy path **and** mathematical edge cases (degenerate
+  inputs, zero and boundary values, orthogonal or parallel cases)
+- Check return types as well as values
+- Floating-point comparisons use `≈` / `isapprox` with an explicit tolerance (`atol=1e-10`
+  unless the mathematics needs otherwise)
+- `@test_throws` for expected errors, `@test_broken` for known failures
+- Plots saved during tests go under `plots/`; the `julia-figure-authoring` skill covers naming
 
 ## Running Tests
 
 ```bash
-# Local
-julia --project=. test/runtests.jl
+# As CI runs them
+julia --project=. -e 'using Pkg; Pkg.test()'
 
-# CI mode
-CI=true julia --project=. test/runtests.jl
+# Simulating CI's headless environment
+CI=true julia --project=. -e 'using Pkg; Pkg.test()'
 ```
 
-## CI/CD Pipeline
+## Tests in CI
 
-- **Tests**: Run on all PRs (`.github/workflows/CI.yml`)
-- **Docs Build**: Test on PR (no deploy)
-- **Docs Deploy**: Auto-deploy to `https://fourm.info/calculus/` on merge to `main`
-- **Cross-Repo**: Deploys to `FourMInfo/math_tech_study` subdirectory
-
-## CI Considerations
-
-- Tests automatically detect CI environment via ENV variables
-- Plotting tests skip gracefully in headless mode
-- 68 tests pass in both local and CI modes (plotting tests with fallbacks)
-- Test execution time: ~15-16 seconds
+- The **test** job runs on pull requests and manual triggers only — not on pushes to `main`,
+  and the deploy job does not wait for it. A change must pass on its pull request before merge.
+- Plotting tests pass headless because of the `GKSwstype` setting and the fallbacks above.
+- CI pipeline details and the deployed docs URL: `ecosystem.instructions.md` and
+  `project.instructions.md`.

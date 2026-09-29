@@ -57,7 +57,7 @@ endpoints, `h` for step size, `n` for sample counts).
 
 ## Tests
 
-- **Test files**: `test_calculus_basics.jl` — currently a placeholder, to be replaced as functions
+- **Test files**: `test_calculus_basic.jl` — currently a placeholder, to be replaced as functions
   are implemented
 
 ## Notebooks

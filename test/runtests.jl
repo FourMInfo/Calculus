@@ -10,7 +10,7 @@ println("Starting tests")
 ti = time()
 
 @testset "Calculus tests" begin
-    include("test_calculus_basics.jl")
+    include("test_calculus_basic.jl")
     # add more test files here
 end
 

@@ -11,6 +11,9 @@ using Reexport
 
 # Integrated plotting functions (computation + visualization)
 
-# include("calculus_basic.jl")  # uncomment once the first functions are written
+# Notebook display helpers (an outcome, value or error, typeset in a LaTeXString block)
+export attempt, latex_error
+
+include("calculus_basic.jl")
 
 end # module

@@ -22,7 +22,8 @@ learning that holds for every study repo goes into those hub templates, not into
 ## Package and Module
 
 - **Main module**: `src/Calculus.jl`
-- **Source files**: `src/calculus_basic.jl` (not yet populated or included)
+- **Source files**: `src/calculus_basic.jl` — notebook display helpers so far (`attempt`,
+  `latex_error`), documented by the `@autodocs` block in `docs/src/index.md` ("Basic Calculus")
 - **Reexported packages**: `CalculusWithJuliaSquared` (CWJS) only. CWJS in turn reexports
   `Plots`, `Symbolics`, `Roots`, `LinearAlgebra`, `SpecialFunctions`, `IntervalSets` and
   `LaTeXStrings`, so `using Calculus` brings all of them. What CWJS itself provides, how it is
@@ -57,8 +58,7 @@ endpoints, `h` for step size, `n` for sample counts).
 
 ## Tests
 
-- **Test files**: `test_calculus_basic.jl` — currently a placeholder, to be replaced as functions
-  are implemented
+- **Test files**: `test_calculus_basic.jl` — tests for the functions in `src/calculus_basic.jl`
 
 ## Notebooks
 

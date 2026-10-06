@@ -12,7 +12,7 @@ using Reexport
 # Integrated plotting functions (computation + visualization)
 
 # Notebook display helpers (an outcome, value or error, typeset in a LaTeXString block)
-export attempt, latex_error
+export attempt, latex_error, latex_cell, latex_type
 
 include("calculus_basic.jl")
 

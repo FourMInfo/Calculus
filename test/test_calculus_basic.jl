@@ -44,4 +44,44 @@
         @test occursin("\\quad \\text{first}\\text{;} \\\\ \\quad \\text{second}", block)
     end
 
+    @testset "latex_cell: a table entry for a value or a caught error" begin
+        # what attempt hands back, as the notebook tables use it
+        @test latex_cell(attempt(() -> factorial(21))) == "\\text{error}"
+        @test latex_cell(attempt(() -> factorial(5))) == "120"
+        @test latex_cell(attempt(() -> factorial(big(21)))) == "51090942171709440000"
+        @test latex_cell(attempt(() -> gamma(6))) == "120.0"
+        @test latex_cell(attempt(() -> gamma(big(31)) == factorial(big(30)))) == "\\mathtt{true}"
+        @test latex_cell(false) == "\\mathtt{false}"
+        # exact ratios as fractions, not Julia's 1//2
+        @test latex_cell(1//2) == "\\frac{1}{2}"
+        @test latex_cell(-3//4) == "-\\frac{3}{4}"
+        @test latex_cell(big(1)//3) == "\\frac{1}{3}"
+        @test latex_cell(4//2) == "2"
+        # infinities and NaN as symbols, not italic letters
+        @test latex_cell(Inf) == "\\infty"
+        @test latex_cell(-Inf) == "-\\infty"
+        @test latex_cell(NaN) == "\\mathrm{NaN}"
+        # a symlim result, as the limits notebook will meet it: value and route
+        @variables x
+        lim = symlim(log(x), x, 0; side = :right)
+        @test latex_cell(lim[1]) == "-\\infty"
+        @test latex_cell(lim[2]) == "\\mathtt{:divergent\\_numeric}"
+        # symbolic results in CWJS's conventional order, not the stored one
+        q = (x^2 - 1)/(x - 1)
+        @test latex_cell(q) == conventional_latex(q)
+        @test latex_cell(q) == "\\frac{x^{2} - 1}{x - 1}"
+        # text is escaped
+        @test latex_cell("a_b & c") == "\\text{a\\_b \\& c}"
+    end
+
+    @testset "latex_type: a table's type column" begin
+        @test latex_type(attempt(() -> factorial(21))) == "\\mathtt{OverflowError}"
+        @test latex_type(attempt(() -> factorial(big(21)))) == "\\mathtt{BigInt}"
+        # a parametric type keeps its braces, which LaTeX would otherwise swallow as grouping
+        @test latex_type(1//2) == "\\mathtt{Rational\\{Int64\\}}"
+        @variables x
+        @test latex_type([x]) == "\\mathtt{Vector\\{Num\\}}"
+        @test latex_type(:divergent_numeric) == "\\mathtt{Symbol}"
+    end
+
 end

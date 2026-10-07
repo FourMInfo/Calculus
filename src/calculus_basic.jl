@@ -1,5 +1,7 @@
 # Notebook display helpers: show a computation's outcome -- a value or the error it raised --
 # inside one typeset LaTeXString block, without the error stopping the notebook cell.
+# A function written by Claude (Anthropic) rather than by Aron ends its docstring with an
+# "Author: Claude" line, so the attribution shows in the published docs.
 
 """
     attempt(f)
@@ -17,6 +19,8 @@ returned, so interrupting still interrupts.
 attempt(() -> factorial(5))    # 120
 attempt(() -> factorial(21))   # OverflowError(...): 21! does not fit in an Int64
 ```
+
+*Author: Claude (Anthropic), written for this study repository at Aron's request.*
 """
 function attempt(f)
     try
@@ -63,6 +67,8 @@ L\"\"\"
 \\end{array}
 \"\"\"
 ```
+
+*Author: Claude (Anthropic), written for this study repository at Aron's request.*
 """
 latex_error(err::Exception) = latex_error(sprint(showerror, err))
 
@@ -101,6 +107,8 @@ L\"\"\"
 \\end{array}
 \"\"\"
 ```
+
+*Author: Claude (Anthropic), written for this study repository at Aron's request.*
 """
 latex_cell(r) = string(r)
 latex_cell(::Exception) = "\\text{error}"
@@ -127,5 +135,7 @@ The type of `r` in typewriter, for the type column of a results table: `%\$(late
 Braces in a parametric type are escaped, so `Rational{Int64}` does not lose them to LaTeX's
 grouping and print as `RationalInt64`. For an error caught by [`attempt`](@ref) it is the
 error's type, e.g. `OverflowError`.
+
+*Author: Claude (Anthropic), written for this study repository at Aron's request.*
 """
 latex_type(r) = "\\mathtt{$(_latex_code_escape(string(typeof(r))))}"

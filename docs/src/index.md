@@ -20,7 +20,7 @@ Since I will be making extensive use of CWJS in my package code, I have also add
 
 ## Notebooks
 
-Since I invested a lot of time in the port, I decided to go through my own version, the [Calculus with Julia Squared notes (CWJSN),](https://fourm.info/cwjsn/) and add my own notebooks, which supplement the materials Verzani provides.
+Since I invested a lot of time in the port, I decided to go through my own version, the [Calculus with Julia Squared notes (CWJSN)](https://fourm.info/cwjsn/), and add my own notebooks, which supplement the materials Verzani provides.
 
 ### Precalculus
 

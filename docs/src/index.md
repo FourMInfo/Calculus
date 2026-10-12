@@ -22,11 +22,11 @@ Since I will be making extensive use of CWJS in my package code, I have also add
 
 Since I invested a lot of time in the port, I decided to go through my own version, the [Calculus with Julia Squared notes (CWJSN)](https://fourm.info/cwjsn/), and add my own notebooks, which supplement the materials Verzani provides.
 
-### Precalculus
+### Mathematical Basics
 
-The opening chapters of CWJSN are the _Mathematical Basics_ and _Precalculus_ sections, starting with [From calculator to computer](https://fourm.info/cwjsn/basics/calculator.html). Most of this material is already covered, often in more depth, in my [Math_Foundations](https://fourm.info/math_foundations/) package and its [Basics notebook](https://github.com/FourMInfo/Math_Foundations/blob/main/notebooks/Basics.ipynb), so I do not repeat it here. You can go through that repo to cover much of the same material.
+The opening chapters of CWJSN are the _Mathematical basics_ section, starting with [From calculator to computer](https://fourm.info/cwjsn/basics/calculator.html). Most of this material is already covered, often in more depth, in my [Math_Foundations](https://fourm.info/math_foundations/) package and its [Basics notebook](https://github.com/FourMInfo/Math_Foundations/blob/main/notebooks/Basics.ipynb), so I do not repeat it here. You can go through that repo to cover much of the same material.
 
-Hence the [PreCalc notebook](https://github.com/FourMInfo/Calculus/blob/main/notebooks/PreCalc.ipynb) only includes material that is new to me in either Julia or the math (or both), along with comments on and/or expansion of points in CWJSN which I feel need further clarification.
+Hence the [Mathematical Basics notebook](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasics.ipynb) only includes material that is new to me in either Julia or the math (or both), along with comments on and/or expansion of points in CWJSN which I feel need further clarification.
 
 ## Package's Module
 

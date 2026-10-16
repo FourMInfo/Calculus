@@ -20,7 +20,7 @@ Since I will be making extensive use of CWJS in my package code, I have also add
 
 ## Notebooks
 
-Since I invested a lot of time in the port, I decided to go through my own version, the [Calculus with Julia Squared notes (CWJSN)](https://fourm.info/cwjsn/), and add my own notebooks, which supplement the materials Verzani provides.
+Since I invested a lot of time in the port, I decided to go through my own version, the [Calculus with Julia Squared notes (CWJSN)](https://fourm.info/cwjsn/), and add my own notebooks, which supplement the materials Verzani provides. In other repos, since I am the owner of all the documentation (even if it is based on books I read), in-depth comments are always added to the documentation. Here, since the source of the CWJSN was written by Professor Verzani, I did not feel comfortable making extensive changes beyond the changes required by moving from `SymPy` to `Symbolics.jl`. Hence in these notebooks you will find extensive commentary on what Verzani wrote, which expresses my deepened understanding of coding in Julia, the CWJS package, and the underlying mathematics. It's worth looking at the notebooks, then, not just for exercises (as in previous repos) but for their expansion on the content of CWJSN.
 
 ### Mathematical Basics
 

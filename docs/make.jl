@@ -11,9 +11,6 @@ makedocs(;
     modules=[Calculus, CalculusWithJuliaSquared],
     sitename = "Calculus",
     pagesonly = true,
-    # Keep Calculus's own content strictly checked; tolerate only what the embedded CWJS
-    # autodocs block needs (mirrors CalculusWithJuliaSquared's own docs/make.jl).
-    warnonly = Documenter.except(:autodocs_block),
     # No doctests here: the only ones are CWJS's docstring examples, and each starts with
     # `using CalculusWithJuliaSquared`, which this env cannot load by name (CWJS comes in
     # through Calculus) -- they failed on every build. CWJS's own test suite runs them.

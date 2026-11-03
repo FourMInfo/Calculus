@@ -29,8 +29,9 @@ Documentation in `docs/src/` explains general math concepts (not code). Follow t
 
 ## Mathematical Notation, MathJax3 & MathWorld Links
 
+See the `document-typesetting` skill for LaTeX formatting rules (`$$` display blocks, bullet point style, `\lbrack`, `\lvert`).
+
 See the `documenter-jl-conventions` skill for:
-- LaTeX formatting rules (`$$` display blocks, bullet point style, `\lbrack`, `\lvert`)
 - MathJax3 configuration for `docs/make.jl`
 - MathWorld linking convention
 

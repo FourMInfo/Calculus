@@ -255,7 +255,53 @@ The time also includes the cost of calling the function and reading the clock, b
 
 The standard Julia tool for this is BenchmarkTools' `@btime`, which repeats the same idea with more care. The hand-written loop has the advantage that every step is visible in the code.
 
-The code outputs the assembly code and then shows the results.
+What follows is the code. It outputs the assembly code and then shows the results.
+
+```julia
+# Type stability: listing length vs speed 
+using InteractiveUtils   # for code_native
+
+function sumloop(v)
+    t = 0
+    for x in v
+        t += x
+    end
+    t
+end
+
+# show the assembly code for sumloop with Vector{Int} argument
+code_native(sumloop, (Vector{Int},); debuginfo=:none) 
+
+v_int = collect(1:10_000)      # Vector{Int64}
+v_any = Vector{Any}(v_int)     # the same values, element type Any
+
+# The compiled machine code as text; count its instructions (labels, directives, comments left out)
+asm(T) = sprint(io -> code_native(io, sumloop, (T,); debuginfo=:none))
+ninstr(T) = count(l -> occursin(r"^\s+[a-z]", l), split(asm(T), "\n"))
+ndispatch(T) = count(l -> occursin("apply_generic", l), split(asm(T), "\n"))
+
+# Best of 200 runs in μs; checking the result stops the compiler from deleting the call
+function besttime(v; runs = 200)
+    best = typemax(UInt64)
+    for _ in 1:runs
+        t0 = time_ns()
+        r = sumloop(v)
+        best = min(best, time_ns() - t0)
+        r == 50_005_000 || error("wrong sum")
+    end
+    best / 1e3
+end
+
+sumloop(v_int); sumloop(v_any)   # compile both before measuring
+println("Timing results:\n")
+for (name, v) in (("Vector{Int}", v_int), ("Vector{Any}", v_any))
+    T = typeof(v)
+    println(name, ": ", ninstr(T), " instructions, ",
+            round(besttime(v), digits = 2), " μs, ",
+            @allocated(sumloop(v)), " bytes allocated, ",
+            ndispatch(T), " dispatcher calls, SIMD adds: ", occursin("add.2d", asm(T)))
+end
+```
 
 The output of the code in the [Mathematical Basics - Part 1](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasicsPart1.ipynb) notebook:
 

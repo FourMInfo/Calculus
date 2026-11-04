@@ -574,11 +574,11 @@ Below are some details about associative arrays created by Claude and edited by 
 
 #### What the term means
 
-Verzani writes that "an associative array associates to each key a value". The term is not his: it is general programming vocabulary. For example, Perl's documentation (`perldata`) says:
+Verzani writes that "an associative array associates to each key a value". This term is general programming vocabulary. For example, Perl's documentation (`perldata`) says:
 
 > Perl has three built-in data types: scalars, arrays of scalars, and associative arrays of scalars, known as "hashes".
 
-The Julia documentation does not use the phrase "associative array", but it uses close variants. The manual's chapter "Style Guide" says "For associative collections, this is the key of the key-value pair(s)". Its chapter "Modules" stretches the term further, to "Associative collections (such as `Dict` and `Set`)", although a `Set` has keys but no values. Julia's own type once had the name as well. The release notes for Julia 0.7 say:
+While the Julia documentation does not use the phrase "associative array", it uses close variants. The manual's chapter "Style Guide" says: "For associative collections, this is the key of the key-value pair(s)". Its chapter "Modules" stretches the term further, to "Associative collections (such as `Dict` and `Set`)", although a `Set` has keys but no values. Julia's own type once had the name as well. The release notes for Julia 0.7 say:
 
 > `Associative` has been deprecated in favor of `AbstractDict`
 
@@ -591,7 +591,7 @@ Dict("a" => 1) isa AbstractDict    # true
 
 #### The other `AbstractDict` types
 
-Verzani also writes "There are other types of associative arrays, specialized cases of the `AbstractDict` type with performance benefits for specific use cases." With no packages loaded, `subtypes(AbstractDict)` lists seven types (`subtypes` comes from `InteractiveUtils`, which the REPL loads for you). Neither CWJSN's chapters nor the source of the CWJS package mention `IdDict`, `WeakKeyDict`, `ImmutableDict` or `PersistentDict`, so this is background rather than something you need in order to follow the book.
+Verzani also writes "There are other types of associative arrays, specialized cases of the `AbstractDict` type with performance benefits for specific use cases." With no packages loaded, `subtypes(AbstractDict)` lists seven types (`subtypes` comes from `InteractiveUtils`, which the REPL loads for you). Neither CWJSN's chapters nor the source of the CWJS package mention `IdDict`, `WeakKeyDict`, `ImmutableDict` or `PersistentDict`, so what follows is background rather than something you need in order to follow the book.
 
 | Type | What is different | Exported from `Base` |
 | :--- | :--- | :--- |
@@ -626,7 +626,7 @@ Dict(true => "yes", 1 => "no", 1.0 => "maybe")             # Dict{Real, String}(
 length(IdDict(true => "yes", 1 => "no", 1.0 => "maybe"))   # 3
 ```
 
-#### `Base.Pairs`: the one you meet without asking
+#### `Base.Pairs`: when do you get a type you didn't explicitly ask for?
 
 When a function collects its keyword arguments with `kw...`, what it receives is an associative array whose keys are symbols:
 
@@ -645,9 +645,9 @@ pairs([10, 20])[2]           # 20
 collect(pairs([10, 20]))     # [1 => 10, 2 => 20]
 ```
 
-#### `ImmutableDict` and `PersistentDict`: adding without changing
+#### `ImmutableDict` and `PersistentDict`: how do you add without changing?
 
-Neither of these changes in place. Adding or removing gives you a new dictionary and leaves the old one as it was. Both need the `Base.` prefix, because they are not exported.
+Neither of these types allows for changes in place. Adding or removing gives you a new dictionary and leaves the old one as it was. Both need the `Base.` prefix, because they are not exported.
 
 An `ImmutableDict` cannot remove a value, only hide it by adding the same key again:
 
@@ -660,7 +660,7 @@ z[:a], y[:a]                 # (9, 1): the new value hides the old one in z only
 length(z)                    # 3: the old entry is still there
 ```
 
-A `PersistentDict` can remove one, again by returning a new dictionary:
+A `PersistentDict` can remove one, but only by returning a new dictionary:
 
 ```julia
 p = Base.PersistentDict(:a => 1)

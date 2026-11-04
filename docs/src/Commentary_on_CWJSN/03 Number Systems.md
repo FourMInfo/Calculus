@@ -255,7 +255,7 @@ The standard Julia tool for this is BenchmarkTools' `@btime`, which repeats the 
 What follows is the code. It outputs the assembly code and then shows the results.
 
 ```julia
-# Type stability: listing length vs speed 
+# Type stability: listing length vs speed
 using InteractiveUtils   # for code_native
 
 function sumloop(v)
@@ -267,7 +267,7 @@ function sumloop(v)
 end
 
 # show the assembly code for sumloop with Vector{Int} argument
-code_native(sumloop, (Vector{Int},); debuginfo=:none) 
+code_native(sumloop, (Vector{Int},); debuginfo=:none)
 
 v_int = collect(1:10_000)      # Vector{Int64}
 v_any = Vector{Any}(v_int)     # the same values, element type Any
@@ -304,76 +304,76 @@ The output of the code in the [Mathematical Basics](https://github.com/FourMInfo
 
 ```text
 .build_version macos, 18, 0
-	.section	__TEXT,__text,regular,pure_instructions
-	.globl	_julia_sumloop_12994            ; -- Begin function julia_sumloop_12994
-	.p2align	2
+        .section        __TEXT,__text,regular,pure_instructions
+        .globl  _julia_sumloop_12994            ; -- Begin function julia_sumloop_12994
+        .p2align        2
 _julia_sumloop_12994:                   ; @julia_sumloop_12994
 ; Function Signature: sumloop(Array{Int64, 1})
 ; %bb.0:                                ; %top
-	;DEBUG_VALUE: sumloop:v <- [$x0+0]
-	;DEBUG_VALUE: sumloop:v <- [$x0+0]
-	ldr	x11, [x0, #16]
-	cbz	x11, LBB0_4
+        ;DEBUG_VALUE: sumloop:v <- [$x0+0]
+        ;DEBUG_VALUE: sumloop:v <- [$x0+0]
+        ldr     x11, [x0, #16]
+        cbz     x11, LBB0_4
 ; %bb.1:                                ; %L34
-	stp	x29, x30, [sp, #-16]!           ; 16-byte Folded Spill
-	mov	x29, sp
-	ldr	x8, [x0]
-	ldr	x0, [x8]
-	subs	x12, x11, #1
-	b.eq	LBB0_10
+        stp     x29, x30, [sp, #-16]!           ; 16-byte Folded Spill
+        mov     x29, sp
+        ldr     x8, [x0]
+        ldr     x0, [x8]
+        subs    x12, x11, #1
+        b.eq    LBB0_10
 ; %bb.2:                                ; %L72.preheader
-	cmp	x11, #9
-	b.hs	LBB0_5
+        cmp     x11, #9
+        b.hs    LBB0_5
 ; %bb.3:
-	mov	w9, #2                          ; =0x2
-	mov	w10, #1                         ; =0x1
-	b	LBB0_8
+        mov     w9, #2                          ; =0x2
+        mov     w10, #1                         ; =0x1
+        b       LBB0_8
 LBB0_4:
-	mov	x0, #0                          ; =0x0
-	ret
+        mov     x0, #0                          ; =0x0
+        ret
 LBB0_5:                                 ; %vector.ph
-	and	x13, x12, #0xfffffffffffffff8
-	orr	x10, x13, #0x1
-	orr	x9, x13, #0x2
-	movi.2d	v0, #0000000000000000
-	movi.2d	v1, #0000000000000000
-	mov.d	v1[0], x0
-	add	x14, x8, #40
-	mov	x15, x13
-	movi.2d	v2, #0000000000000000
-	movi.2d	v3, #0000000000000000
+        and     x13, x12, #0xfffffffffffffff8
+        orr     x10, x13, #0x1
+        orr     x9, x13, #0x2
+        movi.2d v0, #0000000000000000
+        movi.2d v1, #0000000000000000
+        mov.d   v1[0], x0
+        add     x14, x8, #40
+        mov     x15, x13
+        movi.2d v2, #0000000000000000
+        movi.2d v3, #0000000000000000
 LBB0_6:                                 ; %vector.body
                                         ; =>This Inner Loop Header: Depth=1
-	ldp	q4, q5, [x14, #-32]
-	ldp	q6, q7, [x14], #64
-	add.2d	v1, v1, v4
-	add.2d	v0, v0, v5
-	add.2d	v2, v2, v6
-	add.2d	v3, v3, v7
-	subs	x15, x15, #8
-	b.ne	LBB0_6
+        ldp     q4, q5, [x14, #-32]
+        ldp     q6, q7, [x14], #64
+        add.2d  v1, v1, v4
+        add.2d  v0, v0, v5
+        add.2d  v2, v2, v6
+        add.2d  v3, v3, v7
+        subs    x15, x15, #8
+        b.ne    LBB0_6
 ; %bb.7:                                ; %middle.block
-	add.2d	v0, v0, v1
-	add.2d	v0, v2, v0
-	add.2d	v0, v3, v0
-	addp.2d	d0, v0
-	fmov	x0, d0
-	cmp	x12, x13
-	b.eq	LBB0_10
+        add.2d  v0, v0, v1
+        add.2d  v0, v2, v0
+        add.2d  v0, v3, v0
+        addp.2d d0, v0
+        fmov    x0, d0
+        cmp     x12, x13
+        b.eq    LBB0_10
 LBB0_8:                                 ; %L72.preheader1
-	sub	x11, x11, x9
-	add	x11, x11, #1
+        sub     x11, x11, x9
+        add     x11, x11, #1
 LBB0_9:                                 ; %L72
                                         ; =>This Inner Loop Header: Depth=1
-	ldr	x12, [x8, x10, lsl #3]
-	mov	x10, x9
-	add	x9, x9, #1
-	add	x0, x0, x12
-	subs	x11, x11, #1
-	b.ne	LBB0_9
+        ldr     x12, [x8, x10, lsl #3]
+        mov     x10, x9
+        add     x9, x9, #1
+        add     x0, x0, x12
+        subs    x11, x11, #1
+        b.ne    LBB0_9
 LBB0_10:
-	ldp	x29, x30, [sp], #16             ; 16-byte Folded Reload
-	ret
+        ldp     x29, x30, [sp], #16             ; 16-byte Folded Reload
+        ret
                                         ; -- End function
 .subsections_via_symbols
 Timing results:

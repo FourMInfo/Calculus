@@ -12,7 +12,7 @@ Two interesting points I picked up in this chapter.
 Results from the [Mathematical Basics](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasics.ipynb) notebook, where the code runs:
 
 | Julia | value | type | note |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 | `10_000_000_000_000_000_000` | `10000000000000000000` | `Int128` | literal, widened |
 | `1_000_000_000_000_000_000_000_000_000_000_000_000_000` | `1000000000000000000000000000000000000000` | `BigInt` | literal, widened |
 | `10^20` | `7766279631452241920` | `Int64` | wrong: overflow wraps around |
@@ -22,7 +22,7 @@ Results from the [Mathematical Basics](https://github.com/FourMInfo/Calculus/blo
 The wrong way and the right ways side by side:
 
 | Way | Julia | value |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | Wrong | `10^20` | `7766279631452241920` |
 | Right | `big(10)^20` | `100000000000000000000` |
 | Right | `10^big(20)` | `100000000000000000000` |
@@ -36,7 +36,7 @@ Is this a good recommendation?
 If we are just interested in sheer size of numbers, then it is true that floating point values reach much farther than Int64:
 
 | type | largest value | exact for every integer up to |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `Int64` | $2^{63}-1 \approx 9.2 \times 10^{18}$ | all of them (then wraps silently) |
 | `Float64` | $\approx 1.8 \times 10^{308}$ | $2^{53} \approx 9.0 \times 10^{15}$ (then rounds silently) |
 | `BigInt` | limited only by memory | all of them |
@@ -44,7 +44,7 @@ If we are just interested in sheer size of numbers, then it is true that floatin
 However, as Verzani himself notes, these larger values are not always exact. In fact, `Float64`'s exact range is smaller than `Int64`'s. Past $2^{53}$, floats skip integers: `2.0^53 + 1 == 2.0^53` is true. So switching to floats trades one silent failure (wrap-around) for another (rounding), and the rounding starts about a thousand times sooner:
 
 | Julia | exact? |
-| --- | --- |
+| :--- | :--- |
 | `2.0^63` | yes — a power of two |
 | `10.0^20` | yes |
 | `10.0^23` | no — stored as $99999999999999991611392$ |
@@ -66,7 +66,7 @@ $$3987^{12} + 4365^{12} - 4472^{12}$$
 because the equation holds **exactly when that difference is $0$** — so "is it $0$?" is the test. The claim is the answer is yes on calculators, but not in Julia!
 
 | Julia | result | note |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `3987^12 + 4365^12 - 4472^12` | `-842986283280935454` | `Int64` overflow: meaningless |
 | `3987.0^12 + 4365.0^12 - 4472.0^12` | `1.2118937808588159e33` | floats: right size, last digits off |
 | `big(3987)^12 + big(4365)^12 - big(4472)^12` | `1211886809373872630985912112862690` | exact, and not $0$: no counterexample |
@@ -78,7 +78,7 @@ The text mentions `factorial` but doesn't show you how to use it. Below is a tab
 Results from the [Mathematical Basics](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasics.ipynb) notebook, where the code runs:
 
 | Julia | result | type |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `factorial(5)` | `120` | `Int64` |
 | `factorial(20)` | `2432902008176640000` | `Int64` |
 | `factorial(21)` | error | `OverflowError` |
@@ -98,7 +98,7 @@ Note that `factorial` only works for integers. For non-integers use the `gamma` 
 You can see examples of all of the above in the table below:
 
 | Julia | result | type | note |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 | `prod(big(1):big(21))` | `51090942171709440000` | `BigInt` | $= 21!$, no wrap-around |
 | `factorial(5.0)` | error | `MethodError` | integers only |
 | `factorial(-1)` | error | `DomainError` | not defined for negatives |
@@ -114,7 +114,7 @@ Mathematicians make a distinction between _numbers_ which are abstract values an
 In Julia syntax there are also _names_ which are bound to values in various ways. For example `im` or `pi` are names that are bound to constant values. Variables are also names which are bound to values by assignment. And names are also bound to functions in various ways. `sin` is a name bound to a fixed function and `f(x) = x^2` binds `f` to a newly defined function. Names are often juxtaposed with numeric literals. This table should make things clear:
 
 | Typed | Julia sees | Literal? |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `2` | `Int64` | yes |
 | `-1` | `Int64` | yes, the sign is part of it |
 | `-1^2` | `-(1 ^ 2)` | no: only the `1` is a literal; `^` comes before the minus |
@@ -137,7 +137,7 @@ The table below gives examples of how Julia applies its rules, and shows why by 
 With $x = 2$:
 
 | typed | Julia reads | value | not | value |
-| --- | --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- | :--- |
 | `2pi^2pi` | $2\pi^{2\pi}$ | `2658.98` | $2\pi^{2}\cdot\pi$ | `62.01` |
 | `2x^3` | $2x^{3}$ | `16` | $(2x)^{3}$ | `64` |
 | `2^3x` | $2^{3x}$ | `64` | $2^{3}\cdot x$ | `16` |
@@ -146,7 +146,7 @@ With $x = 2$:
 ## Logarithms in Julia vs on paper
 
 | Julia | result | meaning |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `log(x)` | `log(ℯ)` = `1` | natural log, $\ln x$ |
 | `log10(x)` | `log10(1000)` = `3.0` | base 10, $\log_{10} x$ |
 | `log2(x)` | `log2(8)` = `3.0` | base 2, $\log_2 x$ |
@@ -167,7 +167,7 @@ Trap: `log(10, 1000)` = `2.9999999999999996` (it computes $\ln 1000 / \ln 10$); 
 Values marked * were not in my REPL session; they were added afterwards by Claude to complete the comparison. Try to answer on your own before looking at the answers.
 
 | Q | Question (CWJSN) | My Julia → result | Answer | Why |
-| --- | --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- | :--- |
 | 1 | Compute $22/7$ | `22/7` → `3.142857142857143` | `3.142857142857143` | `/` always returns a `Float64` |
 | 2 | Compute $\sqrt{220}$ | `sqrt(220)` → `14.832396974191326` | `14.832396974191326` | `sqrt` always returns a `Float64`, even for a perfect square: `sqrt(16)` → `4.0`\* |
 | 3 | Compute $2^8$ | `2^8` → `256` | `256` | integer base and exponent stay `Int` |

@@ -46,7 +46,7 @@ By contrast, bare `e` is not defined in Julia (`Base.MathConstants.e` is the sam
 Write `b` for either one (measured with Julia 1.13.2, CalculusWithJuliaSquared 0.17.0, Symbolics 7.45.0, `@variables x`):
 
 | computation | `b = e` | `b = ℯ` |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `typeof(b)` | `Float64` | `Irrational{:ℯ}` |
 | `b^2 - exp(2)` | `-8.881784197001252e-16` | `0.0` |
 | `log(b)` | `1.0` | `1` |
@@ -70,7 +70,7 @@ The _CalculusWithJuliaSquared_ text (`precalc/exp_log_functions`) inherits Verza
 Values marked * were not in my REPL session; they were added afterwards by Claude to complete the comparison. As always, try to answer on your own before looking at the answers.
 
 | Q | Question (CWJSN) | My Julia → result | Answer | Why |
-| --- | --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- | :--- |
 | 1 | Let $a=10$, $b=2.3$, $c=8$. Find $(a-b)/(a-c)$ | `a, b, c = 10, 2.3, 8`; `(a − b)/(a − c)` → `3.85` | `3.85` | $7.7/2$. The `−` here is the Unicode minus sign (U+2212), copied from the page's math, not the keyboard `-`; Julia's parser turns it into the ordinary `-`, so `a − b` is `a - b` |
 | 2 | Let `x = 4`. Compute $y=100 - 2x - x^2$ | `x = 4`; `y = 100 - 2x -x^2` → `76` | `76` | $100 - 8 - 16$ |
 | 3 | Value of `a^b - b^a` after `a = 3.2; b=2.3` | `a = 3.2; b=2.3` → `2.3`; `a^b - b^a` → `0.14354012963861962` | `0.14354012963861962` | `;` puts two statements on one line; only the last value is shown |

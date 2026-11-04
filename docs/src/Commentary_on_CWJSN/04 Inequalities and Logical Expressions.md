@@ -13,7 +13,7 @@ $$G = \left(x_1 x_2 \cdots x_n\right)^{1/n}, \qquad n = 2:\ G = (ab)^{1/2} = \sq
 so the power form shows the definition and generalizes by changing the exponent. In the same CWJSN code block, the next line uses `sqrt` for the quadratic mean, so the choice may be stylistic.
 
 | Measured (Julia 1.13.2, $10^7$ values of `rand()`) | Result |
-| --- | --- |
+| :--- | :--- |
 | `x^(1/2) != sqrt(x)` | about 1.05% of values |
 | largest difference | 1 ulp (unit in the last place) |
 | example $x$ | `0.7092888978478461` |
@@ -236,7 +236,7 @@ So the shifts bind more tightly than `*` but less tightly than `^`, the "and" fa
 Values marked * were not in my REPL session; they were added afterwards by Claude to complete the comparison. As always, try to answer on your own before looking at the answers.
 
 | Q | Question (CWJSN) | My Julia → result | Answer | Why |
-| --- | --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- | :--- |
 | 1 | Is `e^pi` or `pi^e` greater? | `ℯ^pi` → `23.140692632779267`; `pi^ℯ` → `22.459157718361038`; `ℯ^pi > pi^ℯ` → `true` | `e^pi` is greater | the two values differ by about 0.68, far more than any rounding error, so the `Float64` comparison can be trusted |
 | 2 | Is $\sin(1000)$ positive? | `sin(1000)` → `0.8268795405320025`; `sin(1000) > 0` → `true` | Yes | 1000 radians is a whole number of turns plus `mod(1000, 2pi)` → `0.9735361584457891`\* radians, which lies in the first quadrant, where sine is positive |
 | 3 | Suppose $0 < a < b$. How are $-1/a$ and $-1/b$ related? | `b = 10`, `a = 5`: `0 < a < b` → `true`; `1/a > 1/b` → `true`; `-1/b > -1/a` → `true` | $-1/a < -1/b$ | for positive numbers, taking reciprocals reverses the order ($1/a > 1/b$), and negating reverses it again |

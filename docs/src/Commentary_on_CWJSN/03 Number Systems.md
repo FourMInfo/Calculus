@@ -11,7 +11,7 @@ In this chapter, in the "Heads up" paragraph regarding `2.*3`, Verzani brings up
 Measured with Julia 1.13.2:
 
 | input | result |
-| --- | --- |
+| :--- | :--- |
 | `1.` | `1.0` (a `Float64`) |
 | `2. * 3` | `6.0`: the dot belongs to the `2` |
 | `2 .* 3` | `6`: the dot belongs to the `*` (broadcast) |
@@ -37,7 +37,7 @@ In the next section you can see examples (created by Claude) of what is discusse
 Measured with Julia 1.13.2.
 
 | error | example → result | why | fix → result |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 | integer overflow | `typemax(Int64) + 1` → `-9223372036854775808`; `2^64` → `0` | `Int64` arithmetic wraps around silently | more bits remove it: `big(2)^64` → `18446744073709551616`, exact |
 | float rounding | `sqrt(2) * sqrt(2) - 2` → `4.440892098500626e-16` | $\sqrt{2}$ has no finite binary expansion | more bits only shrink it: `sqrt(big(2)) * sqrt(big(2)) - 2` → `-1.7272…e-77`; compare with `≈` (next table) |
 | float rounding of π | `sin(1pi)` → `1.2246467991473532e-16` | `1pi` is a `Float64`, the float nearest π but not π (`1pi == pi` → `false`), so its sine is not 0 | keep `pi` an `Irrational`: `sin(pi)` → `0.0`, because Base defines `sin(::Irrational{:π}) = 0.0` (`mathconstants.jl:146`) |
@@ -46,7 +46,7 @@ Measured with Julia 1.13.2.
 `≈` is typed `\approx` then Tab; it is the same function as `isapprox(a, b)`.
 
 | comparison | with `==` | with `≈` |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `0.1 + 0.2` and `0.3` | `false` | `true` |
 | `sqrt(2) * sqrt(2)` and `2` | `false` | `true` |
 | `1/10 + (2/10 + 3/10)` and `(1/10 + 2/10) + 3/10` | `false` | `true` |
@@ -70,7 +70,7 @@ Types form a hierarchy, a tree with `Any` at the top and the concrete types as i
 It's important to note: Verzani's remark that `Rational` and `Complex` "aren't even concrete types" does not mean they are abstract. They are _parametric_ types: families that become concrete once the type of their parts is given. `typeof(1//1)` → `Rational{Int64}`, `typeof(1 + 0im)` → `Complex{Int64}`, `typeof(1.0 + 0im)` → `ComplexF64` (short for `Complex{Float64}`).
 
 | type | kind | `isabstracttype` | `isconcretetype` |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 | `Number`, `Real`, `Integer` | abstract | `true` | `false` |
 | `Int64`, `Int8`, `BigInt`, `Float64` | concrete | `false` | `true` |
 | `Rational`, `Complex` | parametric family | `false` | `false` |
@@ -85,7 +85,7 @@ Abstract types let one function cover many concrete types. With `twice(x::Real) 
 Verzani in this chapter writes a float as $a\cdot 2^b$ with $1 \leq \lvert a\rvert < 2$; the Wikipedia article he links uses $a\cdot 10^b$ with $1 \leq \lvert a\rvert < 10$. The idea is the same in any base $\beta$: $a\cdot\beta^b$ with $1 \leq \lvert a\rvert < \beta$. A `Float64` uses $\beta = 2$ because the hardware stores bits.
 
 | `x` | `significand(x)` | `exponent(x)` | so `x` is |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 | `6.0` | `1.5` | `2` | $1.5\cdot 2^{2}$ |
 | `0.1` | `1.6` | `-4` | $1.6\cdot 2^{-4}$ (nearest float, not exact) |
 | `1e-21` | `1.1805916207174112` | `-70` | $1.18\ldots\cdot 2^{-70}$ |
@@ -118,7 +118,7 @@ $$e^{i\pi} = -1, \qquad\text{i.e.}\qquad e^{i\pi} + 1 = 0 .$$
 This identity is what I came across in my basic Number Theory course. It's famous because it links five important mathematical constants (and only these) in one line: e, i, π, 1 and 0. Mathematicians see it as exemplifying the aesthetic beauty of mathematics. Professor Edward Burger, in his course _Introduction to Number Theory_, states this equation "is considered by many to be the most beautiful in all mathematics."
 
 | Constant | Kind |
-| --- | --- |
+| :--- | :--- |
 | $e$ | transcendental (Hermite 1873) |
 | $\pi$ | transcendental (Lindemann 1882) |
 | $i$ | algebraic: a root of $x^2 + 1$ |
@@ -184,7 +184,7 @@ $$\int_0^{2\pi} \cos^4 x\,dx = \frac{6}{16}\cdot 2\pi = \frac{3\pi}{4} .$$
 Checked numerically in Julia 1.13.2 ($\theta = 0.7$, $a = 0.5$, $b = 3$):
 
 | Check | Computed | Expected |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | Series $\sum_{n=0}^{15} (i\theta)^n/n!$ | `0.7648421872844883 + 0.644217687237691im` | `cis(0.7)` = `0.7648421872844885 + 0.644217687237691im` |
 | $g(\theta)$ at $0.3$, $2.0$, $-5.0$ | `1.0`, `1.0`, `0.9999999999999999` | $1$ |
 | $\cos 3\theta$ | `-0.5048461045998571` | $4\cos^3\theta - 3\cos\theta$ = `-0.5048461045998571` |
@@ -202,7 +202,7 @@ I was not familiar with the term "interned" used by Verzani, so I asked Claude f
 Checked in Julia 1.13.2:
 
 | Expression | Same content (`===`) | Same object in memory (`pointer_from_objref`) |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `Symbol("ab", "c")` vs `:abc` | true | true: one interned copy |
 | `string("ab", "c")` vs `"abc"` | true | false: two separate strings |
 
@@ -217,7 +217,7 @@ I also asked Claude about the relationship between symbols and enumerated types.
 Julia uses symbols internally for an enum's names, but an enum value is not a symbol. Checked in Julia 1.13.2 with `@enum Fruit apple banana`:
 
 | Expression | Result |
-| --- | --- |
+| :--- | :--- |
 | `typeof(apple)` | `Fruit`, a new type whose supertype is `Enum{Int32}` |
 | `Integer(banana)` | `1`: the values are stored as integers |
 | `apple == :apple` | `false`: an enum value is not a symbol |
@@ -387,7 +387,7 @@ This table shows the results of the test based on the run I made (it may vary fr
 #### Apple M2 Max
 
 | Measure | `Vector{Int}` | `Vector{Any}` |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | Machine instructions in the listing | 50 | 69 |
 | Best time | 0.67 μs | 169 μs (about 250× slower) |
 | Memory allocated | 0 bytes | 159,504 bytes |
@@ -401,7 +401,7 @@ I also had Claude run this on an Intel machine out of curiosity. Here are the re
 The same code run as a script, several times on each machine, both on Julia 1.13.2. On Intel the SIMD check looks for `paddq`/`vpaddq` instead of ARM's `add.2d`.
 
 | Machine | Instructions: `Vector{Int}` / `Vector{Any}` | Time `Vector{Int}` | Time `Vector{Any}` | Slowdown |
-| --- | --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- | :--- |
 | Apple M2 Max (2023) | 50 / 69 | 0.71–0.75 μs | 127 μs | about 180× |
 | Intel i5-8500B (2018) | 78 / 77 | 0.81–0.90 μs | 262–283 μs | about 330× |
 
@@ -437,7 +437,7 @@ For example, in `sumloop`, when adding two values, if the types are known the co
 In this chapter numeric literals come up again in relation to powers. Numeric literals and names impact how the power function calculates expressions.
 
 | Typed | Exponent written as | Result |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `2^-1` | a literal numeral | `0.5` |
 | `2^(-1)` | a literal numeral | `0.5` |
 | `a^-1` with `a = 2` | a literal numeral | `0.5` |
@@ -458,7 +458,7 @@ To get $2^{-1}$ from names, make one side non-integer, as the error message sugg
 Values marked * were not in my REPL session; they were added afterwards by Claude to complete the comparison. As always, try to answer on your own before looking at the answers.
 
 | Q | Question (CWJSN) | My Julia → result | Answer | Why |
-| --- | --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- | :--- |
 | 1 | The number created by `pi/2` is? | `pi/2` → `1.5707963267948966`; `typeof(ans)` → `Float64` | Floating point | `pi` is an `Irrational`; arithmetic with it gives a `Float64` |
 | 2 | The number created by `2/2` is? | `2/2` → `1.0`; `typeof(ans)` → `Float64` | Floating point | `/` always returns a `Float64`, even when the division is exact |
 | 3 | The number created by `2//2` is? | `2//2` → `1//1`; `typeof(ans)` → `Rational{Int64}` | Rational | `//` builds a `Rational` and reduces it to lowest terms; it stays a `Rational` even when the value is a whole number |

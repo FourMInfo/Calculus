@@ -7,7 +7,7 @@ Commentary on the CWJSN chapter [Vectors and Containers](https://fourm.info/cwjs
 Many of the topics covered in this chapter are covered in greater depth in my Linear Algebra repository. Below is a table that links topics in this CWJSN chapter to coverage in the documentation of that repo. Note that most of the topics are covered in the _Vectors_ chapter of the _Basics_ section, but some are covered in two chapters of the _Geometry_ section, which is currently less well edited. Links to the _Geometry_ section are clearly marked.
 
 | Topic in the CWJSN vectors chapter | Linear Algebra section |
-| --- | --- |
+| :--- | :--- |
 | A vector as an arrow with a magnitude and a direction | [What is a Vector?](https://fourm.info/linear_algebra/dev/Basics/01%20Vectors/#What-is-a-Vector%3F) |
 | Components and the notation $\langle x,~y \rangle$ | [Vector Notation](https://fourm.info/linear_algebra/dev/Basics/01%20Vectors/#Vector-Notation) |
 | Magnitude $\lVert \vec{v} \rVert = \sqrt{x^2 + y^2}$ | [Length (Magnitude) of a Vector](https://fourm.info/linear_algebra/dev/Basics/01%20Vectors/#Length-%28Magnitude%29-of-a-Vector) |
@@ -39,7 +39,7 @@ A _value_ is what exists while a program runs: what a computation produces, what
 Numbers and strings are values, but so are many other things that at first glance we wouldn't think of as data:
 
 | Expression | Its value | `typeof` of the value |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `5` | the number 5 | `Int64` |
 | `2 + 3` | the number 5 | `Int64` |
 | `2.5` | the number 2.5 | `Float64` |
@@ -152,7 +152,7 @@ The docstring for `Symbol` also calls symbols immutable, although `ismutable(:x)
 In `x = 5`, the `x` is a name, the `5` gives the value, and `:x` is a separate value that represents the name.
 
 | Question | Value | Name | Symbol |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 | What is it? | What exists while the program runs | A word in the source code | A value that represents a name |
 | Does it have a type? | Yes | No, only the value bound to it | Yes, `Symbol` |
 | What does writing it give? | `5` gives 5 | `x` gives the value bound to it | `:x` gives `:x` |
@@ -206,7 +206,7 @@ The Julia manual just talks about collections, and that is the term I personally
 Julia collections differ in four ways: how you get an element out, whether the collection can be changed after it is made, whether its elements share one type, and whether it keeps its elements in order. The table compares the collections in this chapter on those four points. `SVector` and `MVector` come from the `StaticArrays.jl` package; the rest are in Base Julia.
 
 | Collection | Example | Get an element by | Can be changed | Elements share one type | Keeps order |
-| --- | --- | --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 | `Vector` | `[1, 2, 3]` | position: `v[2]` | values, and it can grow or shrink | yes | yes |
 | `Matrix` | `[1 2; 3 4]` | row and column: `m[2, 1]` | values only | yes | yes |
 | `Tuple` | `(1, "a")` | position: `t[2]` | no | no, each position has its own type | yes |
@@ -243,7 +243,7 @@ Taking a collection rather than separate elements is what lets `Set` turn any co
 The other way to make a set is to start with an empty one and add elements with `push!`. Give the element type in braces, `Set{Int}()`; a bare `Set()` has element type `Any`.
 
 | Call | Result | What happens |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `Set([1, 2])` | `Set([2, 1])` | the elements of a vector |
 | `Set((1, 2))` | `Set([2, 1])` | the elements of a tuple |
 | `Set(1:3)` | `Set([3, 2, 1])` | the elements of a range |
@@ -283,7 +283,7 @@ This is where the two rules come from. Duplicates collapse because a dictionary 
 Every set operation is a dictionary operation underneath, and `Set(itr)` itself starts from an empty dictionary and adds each element of `itr` as a key:
 
 | Set operation | What Base does |
-| --- | --- |
+| :--- | :--- |
 | `push!(s, x)` | `s.dict[x] = nothing` |
 | `delete!(s, x)` | `delete!(s.dict, x)` |
 | `x in s` | `haskey(s.dict, x)` |
@@ -317,7 +317,7 @@ So a `Pair` is closer to a tuple of two elements whose positions have names: `Tu
 The table was created assuming `p = "a" => 1` and `d = Dict("a" => 1)`:
 
 | Call | Result | What it shows |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `eltype(d)` | `Pair{String, Int64}` | the elements of a dictionary are pairs |
 | `first(d) == p` | `true` | iterating over `d` gives back `"a" => 1` |
 | `d["a"]` | `1` | a `Dict` looks a value up by its key |
@@ -343,7 +343,7 @@ The two overlap more than the arrow suggests: a pair can be taken apart like a t
 When the positions deserve names, use a `NamedTuple` rather than a `Pair`: `first` and `second` only say which came first.
 
 | Situation | Use | Example |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | key and value | `Pair` | `Dict("a" => 1)`, and `Dict(x => x^2 for x in 1:3)` |
 | replace this with that | `Pair` | `replace([1, 2, 1], 1 => 0)` gives `[0, 2, 0]` |
 | replace this with that, given as a tuple | `Pair` only | `replace("abc", ("a", "x"))` is a `MethodError` |
@@ -369,7 +369,7 @@ Below are some details about Static vectors created by Claude and edited by me.
 So both kinds are static. They differ only in whether their values can change: an `SVector` is an immutable `struct`, an `MVector` a `mutable struct`. An `MVector` is a static vector whose values can change, but whose length still cannot.
 
 | Property | `SVector` | `MVector` |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | Length fixed, part of the type | yes | yes |
 | Change a value: `v[2] = 10` | no: `setindex!` is not defined | yes: gives `[1, 10, 3]` |
 | Grow: `push!(v, 4)` | no | no: `MethodError` (no `resize!`) |
@@ -403,7 +403,7 @@ Below are some details about destructuring created by Claude and edited by me.
 Destructuring pulls several values out of one value and assigns them to several variables in a single statement. Julia has two kinds, and they work differently: one goes by position, the other by name.
 
 | Aspect | By position | By name |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | Syntax | `a, b = v` | `(; x0, x1) = v` |
 | How it works | iterates `v` | reads `v.x0` and `v.x1` |
 | Works on | anything iterable | anything with fields of those names |
@@ -594,7 +594,7 @@ Dict("a" => 1) isa AbstractDict    # true
 Verzani also writes "There are other types of associative arrays, specialized cases of the `AbstractDict` type with performance benefits for specific use cases." With no packages loaded, `subtypes(AbstractDict)` lists seven types (`subtypes` comes from `InteractiveUtils`, which the REPL loads for you). Neither CWJSN's chapters nor the source of the CWJS package mention `IdDict`, `WeakKeyDict`, `ImmutableDict` or `PersistentDict`, so this is background rather than something you need in order to follow the book.
 
 | Type | What is different | Exported from `Base` |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `Dict` | The standard one | yes |
 | `IdDict` | Compares keys with `===` | yes |
 | `WeakKeyDict` | Keys "may be garbage collected even when referenced in a hash table" | yes |

@@ -114,6 +114,10 @@ eval(y)    # 5
 
 A symbol does not need a variable behind it. In `linestyle = :dash` it is only a label. `s = :neverbound` works, and only `eval(s)` throws an `UndefVarError`. Its text does not need to be a valid name either: `Symbol("my key")` is a symbol (as can be seen by checking its `typeof`), though `my key` cannot be written as a plain name.
 
+```@raw html
+<!-- markdownlint-disable MD046 -->
+```
+
 !!! note "An aside"
     You rarely need a symbol like this in your own code, because you choose your own keys and can leave out the space. It mostly comes up when the names come from someone else's data, as when a CSV file is read into a `DataFrame`. A column header such as `my key` becomes a column name that cannot be written as a plain name:
 
@@ -126,6 +130,10 @@ A symbol does not need a variable behind it. In `linestyle = :dash` it is only a
     ```
 
     To avoid such names altogether, `CSV.read` with `normalizenames = true` turns the header into `my_key`.
+
+```@raw html
+<!-- markdownlint-enable MD046 -->
+```
 
 A symbol also does not pick out one particular variable, because scope decides that. `eval` works in global scope, so it does not see a local variable with the same name:
 

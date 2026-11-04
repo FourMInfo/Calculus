@@ -18,15 +18,15 @@ So I decided to go down the quixotic path of porting Verzani's repos to be pure 
 
 Since I will be making extensive use of CWJS in my package code, I have also added CWJS as a re-export to this package. You can see the documentation in the CWJS API link in the left-hand sidebar menu.
 
-## Notebooks
+## Commentary on CWJSN
 
-Since I invested a lot of time in the port, I decided to go through my own version, the [Calculus with Julia Squared notes (CWJSN)](https://fourm.info/cwjsn/), and add my own notebooks, which supplement the materials Verzani provides. In other repos, since I am the owner of all the documentation (even if it is based on books I read), in-depth comments are always added to the documentation. Here, since the source of the CWJSN was written by Professor Verzani, I did not feel comfortable making extensive changes beyond the changes required by moving from `SymPy` to `Symbolics.jl`. Hence in these notebooks you will find extensive commentary on what Verzani wrote, which expresses my deepened understanding of coding in Julia, the CWJS package, and the underlying mathematics. It's worth looking at the notebooks, then, not just for exercises (as in previous repos) but for their expansion on the content of CWJSN.
+Since I invested a lot of time in the port, I decided to go through my own version, the [Calculus with Julia Squared notes (CWJSN)](https://fourm.info/cwjsn/), and add my own commentary, which supplements the materials Verzani provides. In other repos, since I am the owner of all the documentation (even if it is based on books I read), in-depth comments are always added to the documentation. Here, since the source of the CWJSN was written by Professor Verzani, I did not feel comfortable making extensive changes beyond the changes required by moving from `SymPy` to `Symbolics.jl`. Hence the [Commentary on CWJSN](Commentary_on_CWJSN/01 From Calculator to Computer.md) section of this documentation (in the left-hand sidebar menu) holds my extensive commentary on what Verzani wrote, which expresses my deepened understanding of coding in Julia, the CWJS package, and the underlying mathematics. The code behind the results shown there runs in my notebooks.
 
 ### Mathematical Basics
 
 The opening chapters of CWJSN are the _Mathematical basics_ section, starting with [From calculator to computer](https://fourm.info/cwjsn/basics/calculator.html). Most of this material is already covered, on occasion in more depth, in my [Math_Foundations](https://fourm.info/math_foundations/) package and its [Basics notebook](https://github.com/FourMInfo/Math_Foundations/blob/main/notebooks/Basics.ipynb), so I do not repeat that material here. You can go through that repo for that related material.
 
-What these notebooks cover is material that is new to me in either Julia or the math (or both), along with comments on and/or expansion of points in CWJSN which I feel need further clarification. Since there is quite a bit to cover, I split the material into two notebooks. The first one is [Mathematical Basics - Part 1](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasicsPart1.ipynb). The second is in progress. I will add it here when it is completed.
+What the commentary covers is material that is new to me in either Julia or the math (or both), along with comments on and/or expansion of points in CWJSN which I feel need further clarification. The code is split into two notebooks. The first one is [Mathematical Basics - Part 1](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasicsPart1.ipynb). The second is in progress. I will add it here when it is completed.
 
 ## Package's Module
 

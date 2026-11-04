@@ -36,6 +36,13 @@ makedocs(;
             "Integral_Calculus/02 Antiderivatives and Main Theorem.md",
             "Integral_Calculus/03 Integration Techniques.md",
         ],
+        "Commentary on CWJSN" => [
+            "Commentary_on_CWJSN/01 From Calculator to Computer.md",
+            "Commentary_on_CWJSN/02 Variables.md",
+            "Commentary_on_CWJSN/03 Number Systems.md",
+            "Commentary_on_CWJSN/04 Inequalities and Logical Expressions.md",
+            "Commentary_on_CWJSN/05 Vectors and Containers.md",
+        ],
         "sites.md",
     ],
     format = Documenter.HTML(

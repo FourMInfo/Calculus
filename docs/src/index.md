@@ -26,7 +26,7 @@ Since I invested a lot of time in the port, I decided to go through my own versi
 
 The opening chapters of CWJSN are the _Mathematical basics_ section, starting with [From calculator to computer](https://fourm.info/cwjsn/basics/calculator.html). Most of this material is already covered, on occasion in more depth, in my [Math_Foundations](https://fourm.info/math_foundations/) package and its [Basics notebook](https://github.com/FourMInfo/Math_Foundations/blob/main/notebooks/Basics.ipynb), so I do not repeat that material here. You can go through that repo for that related material.
 
-What the commentary covers is material that is new to me in either Julia or the math (or both), along with comments on and/or expansion of points in CWJSN which I feel need further clarification. The code is split into two notebooks. The first one is [Mathematical Basics - Part 1](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasicsPart1.ipynb). The second is in progress. I will add it here when it is completed.
+What the commentary covers is material that is new to me in either Julia or the math (or both), along with comments on and/or expansion of points in CWJSN which I feel need further clarification. The code is in the [Mathematical Basics](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasics.ipynb) notebook.
 
 ## Package's Module
 

@@ -56,13 +56,14 @@ bitstring(Int8(10))        # "00001010"
 12 & 10                    # 8   = 00001000
 12 | 10                    # 14  = 00001110
 ```
+
 On truth values, `&` and `|` apply the same truth value function as `&&` and `||`, but they differ from them in four ways discussed below.
 
 ### 1. Both sides are always evaluated
 
 `&&` and `||` stop evaluating expressions as soon as the answer is known, which is why they are called shortcut (short-circuit) operators. `&` and `|` always evaluate both sides first.
 
-A *guard* is a condition placed first so that the expression after it runs only when that is safe. In `x >= 0 && sqrt(x) > 1`, the test `x >= 0` guards `sqrt(x)`: when `x` is negative, `&&` already knows the answer is `false` and never calls `sqrt`. So a guard only works with `&&` (and `||`), not with `&` (or `|`):
+A _guard_ is a condition placed first so that the expression after it runs only when that is safe. In `x >= 0 && sqrt(x) > 1`, the test `x >= 0` guards `sqrt(x)`: when `x` is negative, `&&` already knows the answer is `false` and never calls `sqrt`. So a guard only works with `&&` (and `||`), not with `&` (or `|`):
 
 ```julia
 x = -4
@@ -115,7 +116,8 @@ v = [-3, 2, 5, 12]
 v[(v .> 0) .& (v .< 10)]    # [2, 5] -- keep the entries between 0 and 10
 (v .< 0) .| (v .> 10)       # Bool[1, 0, 0, 1]
 ```
-**What `v[(v .> 0) .& (v .< 10)]` does**
+
+#### What `v[(v .> 0) .& (v .< 10)]` does
 
 The expression listed in the code above needs some explanation. First, it is read from the inside out, with `v = [-3, 2, 5, 12]`. So step by step we see:
 
@@ -128,7 +130,7 @@ v[Bool[0, 1, 1, 0]]        # [2, 5]            keep the entries marked true
 
 1. **The dot broadcasts.** `v .> 0` compares each entry of `v` with 0 and gives one truth value per entry. The result is a `BitVector`, a vector of truth values packed one per bit, which prints as `Bool[…]`.
 2. **`.&` applies "and" to each pair.** Position by position it combines the two vectors: true only where the entry is both > 0 and < 10.
-3. **Indexing with a vector of truth values selects.** When the index is a vector of `true`/`false` the same length as `v`, `v[mask]` returns the entries where the mask is `true`, in order. This is called *logical indexing*. The mask must have the same length as `v`; `v[[true, false]]` is a BoundsError.
+3. **Indexing with a vector of truth values selects.** When the index is a vector of `true`/`false` the same length as `v`, `v[mask]` returns the entries where the mask is `true`, in order. This is called _logical indexing_. The mask must have the same length as `v`; `v[[true, false]]` is a BoundsError.
 
 It is the same as finding the positions first and then indexing with them: `findall(mask)` gives `[2, 3]`, and `v[[2, 3]]` gives `[2, 5]`.
 
@@ -138,7 +140,8 @@ Two other ways to write the same selection:
 v[0 .< v .< 10]                  # [2, 5]  the chained comparison, broadcast
 filter(x -> 0 < x < 10, v)       # [2, 5]  keep the x for which the test is true
 ```
-**Is it nonetheless possible to use `&&` on vectors? Only the dotted version: `.&&`**
+
+#### Is it nonetheless possible to use `&&` on vectors? Only the dotted version: `.&&`
 
 Since Julia 1.7 there are also `.&&` and `.||`. They have the low precedence of `&&`, so `v .> 0 .&& v .< 10` is correct without parentheses (`Bool[0, 1, 1, 0]`).
 
@@ -233,7 +236,7 @@ So the shifts bind more tightly than `*` but less tightly than `^`, the "and" fa
 Values marked * were not in my REPL session; they were added afterwards by Claude to complete the comparison. As always, try to answer on your own before looking at the answers.
 
 | Q | Question (CWJSN) | My Julia → result | Answer | Why |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | 1 | Is `e^pi` or `pi^e` greater? | `ℯ^pi` → `23.140692632779267`; `pi^ℯ` → `22.459157718361038`; `ℯ^pi > pi^ℯ` → `true` | `e^pi` is greater | the two values differ by about 0.68, far more than any rounding error, so the `Float64` comparison can be trusted |
 | 2 | Is $\sin(1000)$ positive? | `sin(1000)` → `0.8268795405320025`; `sin(1000) > 0` → `true` | Yes | 1000 radians is a whole number of turns plus `mod(1000, 2pi)` → `0.9735361584457891`\* radians, which lies in the first quadrant, where sine is positive |
 | 3 | Suppose $0 < a < b$. How are $-1/a$ and $-1/b$ related? | `b = 10`, `a = 5`: `0 < a < b` → `true`; `1/a > 1/b` → `true`; `-1/b > -1/a` → `true` | $-1/a < -1/b$ | for positive numbers, taking reciprocals reverses the order ($1/a > 1/b$), and negating reverses it again |

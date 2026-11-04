@@ -1,17 +1,18 @@
 # From Calculator to Computer
 
-Commentary on the CWJSN chapter [From Calculator to Computer](https://fourm.info/cwjsn/basics/calculator.html). The code behind the results shown here runs in the [Mathematical Basics - Part 1](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasicsPart1.ipynb) notebook.
+Commentary on the CWJSN chapter [From Calculator to Computer](https://fourm.info/cwjsn/basics/calculator.html). The code behind the results shown here runs in the [Mathematical Basics](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasics.ipynb) notebook.
 
 ## Big Numbers
 
 Two interesting points I picked up in this chapter.
+
 1. In julia you can express a large number using underscores for better readability, e.g., `1_000_000` instead of $1000000$
 2. You need to be careful when you run into big integers. So $10^{20}$ gives a wrong number with no error or warning, while the same value typed as a literal comes out right. If a computation might pass about $9.2 \times 10^{18}$ you need to use `big(...)`
 
-Results from the [Mathematical Basics - Part 1](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasicsPart1.ipynb) notebook, where the code runs:
+Results from the [Mathematical Basics](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasics.ipynb) notebook, where the code runs:
 
 | Julia | value | type | note |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `10_000_000_000_000_000_000` | `10000000000000000000` | `Int128` | literal, widened |
 | `1_000_000_000_000_000_000_000_000_000_000_000_000_000` | `1000000000000000000000000000000000000000` | `BigInt` | literal, widened |
 | `10^20` | `7766279631452241920` | `Int64` | wrong: overflow wraps around |
@@ -21,7 +22,7 @@ Results from the [Mathematical Basics - Part 1](https://github.com/FourMInfo/Cal
 The wrong way and the right ways side by side:
 
 | Way | Julia | value |
-|---|---|---|
+| --- | --- | --- |
 | Wrong | `10^20` | `7766279631452241920` |
 | Right | `big(10)^20` | `100000000000000000000` |
 | Right | `10^big(20)` | `100000000000000000000` |
@@ -34,18 +35,16 @@ Is this a good recommendation?
 
 If we are just interested in sheer size of numbers, then it is true that floating point values reach much farther than Int64:
 
-
 | type | largest value | exact for every integer up to |
-|---|---|---|
+| --- | --- | --- |
 | `Int64` | $2^{63}-1 \approx 9.2 \times 10^{18}$ | all of them (then wraps silently) |
 | `Float64` | $\approx 1.8 \times 10^{308}$ | $2^{53} \approx 9.0 \times 10^{15}$ (then rounds silently) |
 | `BigInt` | limited only by memory | all of them |
 
 However, as Verzani himself notes, these larger values are not always exact. In fact, `Float64`'s exact range is smaller than `Int64`'s. Past $2^{53}$, floats skip integers: `2.0^53 + 1 == 2.0^53` is true. So switching to floats trades one silent failure (wrap-around) for another (rounding), and the rounding starts about a thousand times sooner:
 
-
 | Julia | exact? |
-|---|---|
+| --- | --- |
 | `2.0^63` | yes — a power of two |
 | `10.0^20` | yes |
 | `10.0^23` | no — stored as $99999999999999991611392$ |
@@ -67,7 +66,7 @@ $$3987^{12} + 4365^{12} - 4472^{12}$$
 because the equation holds **exactly when that difference is $0$** — so "is it $0$?" is the test. The claim is the answer is yes on calculators, but not in Julia!
 
 | Julia | result | note |
-|---|---|---|
+| --- | --- | --- |
 | `3987^12 + 4365^12 - 4472^12` | `-842986283280935454` | `Int64` overflow: meaningless |
 | `3987.0^12 + 4365.0^12 - 4472.0^12` | `1.2118937808588159e33` | floats: right size, last digits off |
 | `big(3987)^12 + big(4365)^12 - big(4472)^12` | `1211886809373872630985912112862690` | exact, and not $0$: no counterexample |
@@ -76,10 +75,10 @@ because the equation holds **exactly when that difference is $0$** — so "is it
 
 The text mentions `factorial` but doesn't show you how to use it. Below is a table that does.
 
-Results from the [Mathematical Basics - Part 1](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasicsPart1.ipynb) notebook, where the code runs:
+Results from the [Mathematical Basics](https://github.com/FourMInfo/Calculus/blob/main/notebooks/MathematicalBasics.ipynb) notebook, where the code runs:
 
 | Julia | result | type |
-|---|---|---|
+| --- | --- | --- |
 | `factorial(5)` | `120` | `Int64` |
 | `factorial(20)` | `2432902008176640000` | `Int64` |
 | `factorial(21)` | error | `OverflowError` |
@@ -92,14 +91,14 @@ Notice how unlike the power function, the factorial function in Julia will throw
 OverflowError: 21 is too large to look up in the table; consider using `factorial(big(21))` instead
 ```
 
-Also notice that the `prod` function multiplies in `Int64` and wraps around silently like `^`. If you want, use `prod(big(1):big(21))`. 
+Also notice that the `prod` function multiplies in `Int64` and wraps around silently like `^`. If you want, use `prod(big(1):big(21))`.
 
 Note that `factorial` only works for integers. For non-integers use the `gamma` function, which extends it to real (and complex) numbers using an integral. Since that is related to future lessons, we will skip the details here. The important thing to remember at this point, is that `gamma` shifts by 1 relative to factorial.
 
 You can see examples of all of the above in the table below:
 
 | Julia | result | type | note |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `prod(big(1):big(21))` | `51090942171709440000` | `BigInt` | $= 21!$, no wrap-around |
 | `factorial(5.0)` | error | `MethodError` | integers only |
 | `factorial(-1)` | error | `DomainError` | not defined for negatives |
@@ -110,12 +109,12 @@ You can see examples of all of the above in the table below:
 
 ## Numeric Literals: numerals written in Julia syntax
 
-Mathematicians make a distinction between _numbers_ which are abstract values and _numerals_ which are representations of those values. _Numeric literals_ are how numerals are written in Julia syntax. But the reverse isn't always true - numerals representing numbers in standard math are not always represented as numeric literals. 
+Mathematicians make a distinction between _numbers_ which are abstract values and _numerals_ which are representations of those values. _Numeric literals_ are how numerals are written in Julia syntax. But the reverse isn't always true - numerals representing numbers in standard math are not always represented as numeric literals.
 
 In Julia syntax there are also _names_ which are bound to values in various ways. For example `im` or `pi` are names that are bound to constant values. Variables are also names which are bound to values by assignment. And names are also bound to functions in various ways. `sin` is a name bound to a fixed function and `f(x) = x^2` binds `f` to a newly defined function. Names are often juxtaposed with numeric literals. This table should make things clear:
 
 | Typed | Julia sees | Literal? |
-|---|---|---|
+| --- | --- | --- |
 | `2` | `Int64` | yes |
 | `-1` | `Int64` | yes, the sign is part of it |
 | `-1^2` | `-(1 ^ 2)` | no: only the `1` is a literal; `^` comes before the minus |
@@ -129,8 +128,7 @@ In Julia syntax there are also _names_ which are bound to values in various ways
 | `2sin(x)` | `2 * sin(x)` | no, a juxtaposed literal and a function call |
 | `pi`, `im` | a name | no |
 
-
-In the CWJSN section on `Numeric literals` the author asks what is the value of `2pi^2pi` and the author notes that the correct answer is `2 * (pi ^ (2pi))` because this is the "usual mathematical convention". He does not make clear why that is the case. The explanation is: the juxtaposed product `2pi` (a numeric literal `2`, written directly against the named constant `pi`) to the right of the exponent is read as a single term - i.e. the exponent itself. By contrast, using PEMDAS the power symbol (`^`) is tied to the term immediately to the left, i.e. the `pi`. Once the exponential term is calculated, we multiply it by the leftmost term. 
+In the CWJSN section on `Numeric literals` the author asks what is the value of `2pi^2pi` and the author notes that the correct answer is `2 * (pi ^ (2pi))` because this is the "usual mathematical convention". He does not make clear why that is the case. The explanation is: the juxtaposed product `2pi` (a numeric literal `2`, written directly against the named constant `pi`) to the right of the exponent is read as a single term - i.e. the exponent itself. By contrast, using PEMDAS the power symbol (`^`) is tied to the term immediately to the left, i.e. the `pi`. Once the exponential term is calculated, we multiply it by the leftmost term.
 
 Be sure to note that in this example, PEMDAS applies only to the left-hand side while on the right-hand side the juxtaposition rule applies. Without the juxtaposition, PEMDAS always applies. In the case of an explicit `*` with no juxtaposition, the usual PEMDAS order returns, so `2^3*x` is $2^3 \cdot x$, not $2^{3x}$ (last row in table below). Hence the author's advice to be explicit.
 
@@ -139,7 +137,7 @@ The table below gives examples of how Julia applies its rules, and shows why by 
 With $x = 2$:
 
 | typed | Julia reads | value | not | value |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `2pi^2pi` | $2\pi^{2\pi}$ | `2658.98` | $2\pi^{2}\cdot\pi$ | `62.01` |
 | `2x^3` | $2x^{3}$ | `16` | $(2x)^{3}$ | `64` |
 | `2^3x` | $2^{3x}$ | `64` | $2^{3}\cdot x$ | `16` |
@@ -148,7 +146,7 @@ With $x = 2$:
 ## Logarithms in Julia vs on paper
 
 | Julia | result | meaning |
-|---|---|---|
+| --- | --- | --- |
 | `log(x)` | `log(ℯ)` = `1` | natural log, $\ln x$ |
 | `log10(x)` | `log10(1000)` = `3.0` | base 10, $\log_{10} x$ |
 | `log2(x)` | `log2(8)` = `3.0` | base 2, $\log_2 x$ |
@@ -169,7 +167,7 @@ Trap: `log(10, 1000)` = `2.9999999999999996` (it computes $\ln 1000 / \ln 10$); 
 Values marked * were not in my REPL session; they were added afterwards by Claude to complete the comparison. Try to answer on your own before looking at the answers.
 
 | Q | Question (CWJSN) | My Julia → result | Answer | Why |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | 1 | Compute $22/7$ | `22/7` → `3.142857142857143` | `3.142857142857143` | `/` always returns a `Float64` |
 | 2 | Compute $\sqrt{220}$ | `sqrt(220)` → `14.832396974191326` | `14.832396974191326` | `sqrt` always returns a `Float64`, even for a perfect square: `sqrt(16)` → `4.0`\* |
 | 3 | Compute $2^8$ | `2^8` → `256` | `256` | integer base and exponent stay `Int` |
@@ -200,7 +198,7 @@ Values marked * were not in my REPL session; they were added afterwards by Claud
 | 27 | Will `-2^2` produce `4` or `-4`? | `-2^2` → `-4` | `-4` | as Q17: parses as `-(2 ^ 2)`\* |
 | 28a | Twitter post: $8 \div 2(2+2)$ — what is the answer by strict left-to-right PEMDAS? | `8/2*(2+2)` → `16.0`; `8/(2*(2+2))` → `1.0` | `16` | the chapter takes strict left-to-right PEMDAS, treating `2(2+2)` as an ordinary multiplication; reading implied multiplication as binding tighter gives 1. A choice of convention |
 | 28b | Does `Julia` give the strict left-to-right PEMDAS answer for `8÷2(2+2)`? Why or why not? | `8÷2(2+2)` → `1`; `8 ÷ (2 * (2 + 2))` → `1` | No; Julia gives numeric literal coefficients higher precedence than `*`, `/` and `÷` | Julia reads `8 ÷ (2 * (2 + 2))`; `÷` is integer division, so the result is an `Int` |
-| 29 | Sagan's number, 10 sextillion ($10^{22}$): which entry does *not* work? `10*10^21`, `10*10.0^21`, `10e21`, `1e22`, `10_000_000_000_000_000_000_000` | `10*10^21` → `1864712049423024128`\*; `10*10.0^21` → `1.0e22`\*; `10e21` → `1.0e22`\*; `1e22` → `1.0e22`\*; `10_000_000_000_000_000_000_000` → `10000000000000000000000`\* | `10*10^21` | `10^21` has an integer base, so it overflows `Int64` and wraps silently: `10^18` → `1000000000000000000`\* is the last power that fits; `10^19` → `-8446744073709551616`\*, past `typemax(Int64)` = `9223372036854775807`\*. A float base (`10.0^21`) or a float literal (`10e21`, `1e22`) does not overflow; the long literal is parsed as `Int128`\* |
+| 29 | Sagan's number, 10 sextillion ($10^{22}$): which entry does _not_ work? `10*10^21`, `10*10.0^21`, `10e21`, `1e22`, `10_000_000_000_000_000_000_000` | `10*10^21` → `1864712049423024128`\*; `10*10.0^21` → `1.0e22`\*; `10e21` → `1.0e22`\*; `1e22` → `1.0e22`\*; `10_000_000_000_000_000_000_000` → `10000000000000000000000`\* | `10*10^21` | `10^21` has an integer base, so it overflows `Int64` and wraps silently: `10^18` → `1000000000000000000`\* is the last power that fits; `10^19` → `-8446744073709551616`\*, past `typemax(Int64)` = `9223372036854775807`\*. A float base (`10.0^21`) or a float literal (`10e21`, `1e22`) does not overflow; the long literal is parsed as `Int128`\* |
 | 30 | Planck length $l_p = \sqrt{\hbar G / c^3}$ comes out near $10^{-32}$, not $10^{-35}$. Why? | with `c = 299_792_458;` `planck_length = sqrt(h_bar * G / c^3)` → `3.5793584153084007e-32`; with `c = big(299_792_458)` → `1.6162550244237053…e-35` (full value below) | "`Julia` computes this value incorrectly" | `c^3` overflows `Int64` silently: `299_792_458^3` → `5493783091195596520`\*, but the true value is `26944002417373989539335912`\*, above `typemax(Int64)` = `9223372036854775807`\*. `big(c)` fixes it, as does a float: `c = 299792458.0` gives `1.6162550244237053e-35`\* |
 
 Q30 with `c = big(299_792_458)`, in full: `1.616255024423705337061393098475417498117496219791154915828327386777545429675462e-35`

@@ -7,7 +7,7 @@ Commentary on the CWJSN chapter [Vectors and Containers](https://fourm.info/cwjs
 Many of the topics covered in this chapter are covered in greater depth in my Linear Algebra repository. Below is a table that links topics in this CWJSN chapter to coverage in the documentation of that repo. Note that most of the topics are covered in the _Vectors_ chapter of the _Basics_ section, but some are covered in two chapters of the _Geometry_ section, which is currently less well edited. Links to the _Geometry_ section are clearly marked.
 
 | Topic in the CWJSN vectors chapter | Linear Algebra section |
-|---|---|
+| --- | --- |
 | A vector as an arrow with a magnitude and a direction | [What is a Vector?](https://fourm.info/linear_algebra/dev/Basics/01%20Vectors/#What-is-a-Vector%3F) |
 | Components and the notation $\langle x,~y \rangle$ | [Vector Notation](https://fourm.info/linear_algebra/dev/Basics/01%20Vectors/#Vector-Notation) |
 | Magnitude $\lVert \vec{v} \rVert = \sqrt{x^2 + y^2}$ | [Length (Magnitude) of a Vector](https://fourm.info/linear_algebra/dev/Basics/01%20Vectors/#Length-%28Magnitude%29-of-a-Vector) |
@@ -30,16 +30,16 @@ Below are some details about values, names and symbols created by Claude and edi
 
 #### Values
 
-A *value* is what exists while a program runs: what a computation produces, what a name refers to and what a collection holds. The manual uses the word without giving it a formal definition, but it says two things about all values. In the chapter "Types":
+A _value_ is what exists while a program runs: what a computation produces, what a name refers to and what a collection holds. The manual uses the word without giving it a formal definition, but it says two things about all values. In the chapter "Types":
 
 > all values in Julia are true objects having a type
-
+>
 > Only values, not variables, have types – variables are simply names bound to values
 
 Numbers and strings are values, but so are many other things that at first glance we wouldn't think of as data:
 
 | Expression | Its value | `typeof` of the value |
-|---|---|---|
+| --- | --- | --- |
 | `5` | the number 5 | `Int64` |
 | `2 + 3` | the number 5 | `Int64` |
 | `2.5` | the number 2.5 | `Float64` |
@@ -62,7 +62,7 @@ typeof(x)      # String
 
 #### Names
 
-A *name* is a word written in the source code. As we saw in the [Numeric Literals](01 From Calculator to Computer.md#Numeric-Literals:-numerals-written-in-Julia-syntax) section, names are bound to values in various ways. The manual's chapter "Variables" says:
+A _name_ is a word written in the source code. As we saw in the [Numeric Literals](01 From Calculator to Computer.md#Numeric-Literals:-numerals-written-in-Julia-syntax) section, names are bound to values in various ways. The manual's chapter "Variables" says:
 
 > A variable, in Julia, is a name associated (or bound) to a value.
 
@@ -82,7 +82,7 @@ b              # still [1, 2, 3]
 
 #### Symbols
 
-A *symbol* is a value of type `Symbol` that represents a name. The docstring for `Symbol` defines it as follows:
+A _symbol_ is a value of type `Symbol` that represents a name. The docstring for `Symbol` defines it as follows:
 
 > The type of object used to represent identifiers in parsed julia code (ASTs). Also often used as a name or label to identify an entity (e.g. as a dictionary key).
 
@@ -144,7 +144,7 @@ The docstring for `Symbol` also calls symbols immutable, although `ismutable(:x)
 In `x = 5`, the `x` is a name, the `5` gives the value, and `:x` is a separate value that represents the name.
 
 | Question | Value | Name | Symbol |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | What is it? | What exists while the program runs | A word in the source code | A value that represents a name |
 | Does it have a type? | Yes | No, only the value bound to it | Yes, `Symbol` |
 | What does writing it give? | `5` gives 5 | `x` gives the value bound to it | `:x` gives `:x` |
@@ -189,7 +189,7 @@ Below are some details about Collections and Containers created by Claude and ed
 
 #### What Collections and Containers are
 
-A *container* is a computer language value whose job it is to hold other values, its *elements*, and to hand them back. Verzani uses the term throughout this chapter but defines it only in passing. Where a programming language uses both words (Python, for one), *collections* narrows the term to refer to containers with a set of operations, including count, iterate, and often add and remove.
+A _container_ is a computer language value whose job it is to hold other values, its _elements_, and to hand them back. Verzani uses the term throughout this chapter but defines it only in passing. Where a programming language uses both words (Python, for one), _collections_ narrows the term to refer to containers with a set of operations, including count, iterate, and often add and remove.
 
 The Julia manual just talks about collections, and that is the term I personally have seen in all the books and articles I've read about Julia. In what follows we will stick to that, and refer to "collections", although Verzani uses both terms interchangeably. Rather than define the word, the manual's chapter "Collections and Data Structures" groups them by what they let you do (the operations): every collection can be iterated (`for x in c`) and has a `length`; some can be indexed by position (`c[i]`); dictionaries look a value up by a key; sets only answer whether a value is a member; and some can grow and shrink.
 
@@ -198,7 +198,7 @@ The Julia manual just talks about collections, and that is the term I personally
 Julia collections differ in four ways: how you get an element out, whether the collection can be changed after it is made, whether its elements share one type, and whether it keeps its elements in order. The table compares the collections in this chapter on those four points. `SVector` and `MVector` come from the `StaticArrays.jl` package; the rest are in Base Julia.
 
 | Collection | Example | Get an element by | Can be changed | Elements share one type | Keeps order |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `Vector` | `[1, 2, 3]` | position: `v[2]` | values, and it can grow or shrink | yes | yes |
 | `Matrix` | `[1 2; 3 4]` | row and column: `m[2, 1]` | values only | yes | yes |
 | `Tuple` | `(1, "a")` | position: `t[2]` | no | no, each position has its own type | yes |
@@ -213,11 +213,11 @@ Julia collections differ in four ways: how you get an element out, whether the c
 
 Notes, all run on Julia 1.13.3 (StaticArrays 1.9.24):
 
-- "Share one type" means one *element type*, `eltype`. It may be an abstract type: `[1, "a"]` is a `Vector{Any}`, while `[1, 2.0]` promotes both entries and is a `Vector{Float64}`.
+- "Share one type" means one _element type_, `eltype`. It may be an abstract type: `[1, "a"]` is a `Vector{Any}`, while `[1, 2.0]` promotes both entries and is a `Vector{Float64}`.
 - Grow or shrink: `push!`, `pop!`, `deleteat!` on a vector; `d["b"] = 2` and `delete!(d, "a")` on a dictionary; `push!` and `delete!` on a set.
 - "Can be changed" describes what these operations do, not what `ismutable` reports, which can mislead both ways. `ismutable(Set([1, 2]))` is `false`, yet `push!` adds to it (see section below about Sets). `ismutable("abc")` is `true`, yet a string has no operation that changes it (no `setindex!`, no `push!`).
 - "range" is not a type name: ranges come in several types, all subtypes of `AbstractRange`. `1:3` is a `UnitRange`, `1:2:9` a `StepRange`, and `0:0.5:2` a `StepRangeLen`. Lowercase `range` is a function that builds one.
-- A string is indexed by *byte* position, not by character count. In `"abc"` the two agree, but `α` takes two bytes, so in `"αβγ"` the characters sit at indices 1, 3 and 5, and `"αβγ"[2]` throws a `StringIndexError`.
+- A string is indexed by _byte_ position, not by character count. In `"abc"` the two agree, but `α` takes two bytes, so in `"αβγ"` the characters sit at indices 1, 3 and 5, and `"αβγ"[2]` throws a `StringIndexError`.
 - A dictionary or a set keeps neither the order you inserted nor sorted order: `Dict("c" => 1, "a" => 2, "b" => 3)` iterates `"a"`, `"c"`, `"b"`.
 - Every collection here can be iterated, but `for x in c` does not always hand you what you might expect. A dictionary gives you `Pair`s: `for x in Dict("a" => 1)` sets `x` to `"a" => 1`, so write `for (k, v) in d` to get the key and the value separately. A string gives you `Char`s, one per character however many bytes it takes: `"αβγ"` occupies 6 bytes but `for x in "αβγ"` runs 3 times.
 - A static vector's length is part of its type, so even an `MVector` cannot grow (see section below about static vectors).
@@ -230,12 +230,12 @@ Below are some details about `Set`s created by Claude and edited by me.
 
 The constructor `Set` takes one argument, an existing collection (or anything else that can be iterated over), and builds a new set from its elements. You can't construct a set by passing the elements as separate arguments: `Set(1, 2)` is a `MethodError`. When constructing the set from the collection, duplicates collapse to one element and the order of the source collection is dropped, since a set keeps no order. The source collection is not changed; the set is a new object.
 
-Taking a collection rather than separate elements is what lets `Set` turn any collection we already have—a vector in a variable, a range, a string—into a set. It also means a collection given to `Set` is always read as the *source* of the elements, never as an element itself: a set whose one element is a vector needs the vector wrapped in another collection.
+Taking a collection rather than separate elements is what lets `Set` turn any collection we already have—a vector in a variable, a range, a string—into a set. It also means a collection given to `Set` is always read as the _source_ of the elements, never as an element itself: a set whose one element is a vector needs the vector wrapped in another collection.
 
 The other way to make a set is to start with an empty one and add elements with `push!`. Give the element type in braces, `Set{Int}()`; a bare `Set()` has element type `Any`.
 
 | Call | Result | What happens |
-|---|---|---|
+| --- | --- | --- |
 | `Set([1, 2])` | `Set([2, 1])` | the elements of a vector |
 | `Set((1, 2))` | `Set([2, 1])` | the elements of a tuple |
 | `Set(1:3)` | `Set([3, 2, 1])` | the elements of a range |
@@ -263,7 +263,7 @@ struct Set{T} <: AbstractSet{T}
 end
 ```
 
-The elements of the set are the *keys* of that dictionary. Every value is `nothing`, so only the keys carry information:
+The elements of the set are the _keys_ of that dictionary. Every value is `nothing`, so only the keys carry information:
 
 ```julia
 s = Set([1, 2, 2, 1])
@@ -275,7 +275,7 @@ This is where the two rules come from. Duplicates collapse because a dictionary 
 Every set operation is a dictionary operation underneath, and `Set(itr)` itself starts from an empty dictionary and adds each element of `itr` as a key:
 
 | Set operation | What Base does |
-|---|---|
+| --- | --- |
 | `push!(s, x)` | `s.dict[x] = nothing` |
 | `delete!(s, x)` | `delete!(s.dict, x)` |
 | `x in s` | `haskey(s.dict, x)` |
@@ -309,7 +309,7 @@ So a `Pair` is closer to a tuple of two elements whose positions have names: `Tu
 The table was created assuming `p = "a" => 1` and `d = Dict("a" => 1)`:
 
 | Call | Result | What it shows |
-|---|---|---|
+| --- | --- | --- |
 | `eltype(d)` | `Pair{String, Int64}` | the elements of a dictionary are pairs |
 | `first(d) == p` | `true` | iterating over `d` gives back `"a" => 1` |
 | `d["a"]` | `1` | a `Dict` looks a value up by its key |
@@ -326,7 +326,7 @@ All run on Julia 1.13.3.
 
 #### When to use a `Pair` and when a `Tuple`
 
-Use a `Pair` when two values stand in a *relation* with a direction: e.g. this key to that value, this index to that entry, replace this with that. The arrow indicates which side is which, and functions that expect such a relation need a `Pair` (e.g. `replace` in the table below).
+Use a `Pair` when two values stand in a _relation_ with a direction: e.g. this key to that value, this index to that entry, replace this with that. The arrow indicates which side is which, and functions that expect such a relation need a `Pair` (e.g. `replace` in the table below).
 
 Use a `Tuple` for a fixed group (of any length) of values, with no direction between these values: e.g. the several results of one function, coordinates, the arguments to pass to a function. Functions that return more than one value return a tuple, which is then taken apart by assignment.
 
@@ -335,7 +335,7 @@ The two overlap more than the arrow suggests: a pair can be taken apart like a t
 When the positions deserve names, use a `NamedTuple` rather than a `Pair`: `first` and `second` only say which came first.
 
 | Situation | Use | Example |
-|---|---|---|
+| --- | --- | --- |
 | key and value | `Pair` | `Dict("a" => 1)`, and `Dict(x => x^2 for x in 1:3)` |
 | replace this with that | `Pair` | `replace([1, 2, 1], 1 => 0)` gives `[0, 2, 0]` |
 | replace this with that, given as a tuple | `Pair` only | `replace("abc", ("a", "x"))` is a `MethodError` |
@@ -354,14 +354,14 @@ Below are some details about Static vectors created by Claude and edited by me.
 
 #### What `SVector` and `MVector` are
 
-`SVector` and `MVector` come from the `StaticArrays.jl` package. The *static* in its name does not mean "unchangeable". It means the **length is fixed and is part of the type**: `SVector(1, 2, 3)` is an `SVector{3, Int64}`, and `MVector(1, 2, 3)` an `MVector{3, Int64}`. The package README says so directly:
+`SVector` and `MVector` come from the `StaticArrays.jl` package. The _static_ in its name does not mean "unchangeable". It means the **length is fixed and is part of the type**: `SVector(1, 2, 3)` is an `SVector{3, Int64}`, and `MVector(1, 2, 3)` an `MVector{3, Int64}`. The package README says so directly:
 
-> "statically sized" means that the size can be determined from the *type*, and "static" does **not** necessarily imply `immutable`.
+> "statically sized" means that the size can be determined from the _type_, and "static" does **not** necessarily imply `immutable`.
 
 So both kinds are static. They differ only in whether their values can change: an `SVector` is an immutable `struct`, an `MVector` a `mutable struct`. An `MVector` is a static vector whose values can change, but whose length still cannot.
 
 | Property | `SVector` | `MVector` |
-|---|---|---|
+| --- | --- | --- |
 | Length fixed, part of the type | yes | yes |
 | Change a value: `v[2] = 10` | no: `setindex!` is not defined | yes: gives `[1, 10, 3]` |
 | Grow: `push!(v, 4)` | no | no: `MethodError` (no `resize!`) |
@@ -395,7 +395,7 @@ Below are some details about destructuring created by Claude and edited by me.
 Destructuring pulls several values out of one value and assigns them to several variables in a single statement. Julia has two kinds, and they work differently: one goes by position, the other by name.
 
 | Aspect | By position | By name |
-|---|---|---|
+| --- | --- | --- |
 | Syntax | `a, b = v` | `(; x0, x1) = v` |
 | How it works | iterates `v` | reads `v.x0` and `v.x1` |
 | Works on | anything iterable | anything with fields of those names |
@@ -436,7 +436,7 @@ This is how you can extract the different parts of the value a function returns.
 
 #### Destructuring by name
 
-Each variable receives the field with the same name. The manual: "Instead of destructuring based on iteration, the right side of assignments can also be destructured using property names." A *property* is what `v.name` reads; for most values it is simply a field.
+Each variable receives the field with the same name. The manual: "Instead of destructuring based on iteration, the right side of assignments can also be destructured using property names." A _property_ is what `v.name` reads; for most values it is simply a field.
 
 ```julia
 nt = (x0 = 1, x1 = 4, y0 = 2, y1 = 6)
@@ -586,7 +586,7 @@ Dict("a" => 1) isa AbstractDict    # true
 Verzani also writes "There are other types of associative arrays, specialized cases of the `AbstractDict` type with performance benefits for specific use cases." With no packages loaded, `subtypes(AbstractDict)` lists seven types (`subtypes` comes from `InteractiveUtils`, which the REPL loads for you). Neither CWJSN's chapters nor the source of the CWJS package mention `IdDict`, `WeakKeyDict`, `ImmutableDict` or `PersistentDict`, so this is background rather than something you need in order to follow the book.
 
 | Type | What is different | Exported from `Base` |
-|---|---|---|
+| --- | --- | --- |
 | `Dict` | The standard one | yes |
 | `IdDict` | Compares keys with `===` | yes |
 | `WeakKeyDict` | Keys "may be garbage collected even when referenced in a hash table" | yes |

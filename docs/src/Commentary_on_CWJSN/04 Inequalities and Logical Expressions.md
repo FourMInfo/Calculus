@@ -23,6 +23,7 @@ so the power form shows the definition and generalizes by changing the exponent.
 As for whether the two different expressions are `==`, running a test returns `false` for some inputs. With `a = 0.7092888978478461` and `b = 1.0` (chosen so the product will be equal to `x` in the table above):
 
 ```julia
+a = 0.7092888978478461; b = 1.0
 sqrt(a * b) == (a * b)^(1/2)   # false
 sqrt(a * b)                    # 0.842192910114925
 (a * b)^(1/2)                  # 0.8421929101149249
@@ -122,6 +123,7 @@ v[(v .> 0) .& (v .< 10)]    # [2, 5] -- keep the entries between 0 and 10
 The expression listed in the code above needs some explanation. First, it is read from the inside out, with `v = [-3, 2, 5, 12]`. So step by step we see:
 
 ```julia
+v = [-3, 2, 5, 12]
 v .> 0                     # Bool[0, 1, 1, 1]  is each entry > 0?
 v .< 10                    # Bool[1, 1, 1, 0]  is each entry < 10?
 (v .> 0) .& (v .< 10)      # Bool[0, 1, 1, 0]  "and", applied entry by entry
@@ -137,6 +139,7 @@ It is the same as finding the positions first and then indexing with them: `find
 Two other ways to write the same selection:
 
 ```julia
+v = [-3, 2, 5, 12]
 v[0 .< v .< 10]                  # [2, 5]  the chained comparison, broadcast
 filter(x -> 0 < x < 10, v)       # [2, 5]  keep the x for which the test is true
 ```

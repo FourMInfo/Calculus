@@ -293,6 +293,7 @@ Every set operation is a dictionary operation underneath, and `Set(itr)` itself 
 Because `Set` is a `struct`, not a `mutable struct`, its one field can never be made to point to a different `Dict`. Using `push!` does not contradict the immutability of the struct. What it does is add a key to the `Dict` the field already points to.
 
 ```julia
+s = Set([1, 2, 2, 1])
 d = s.dict
 push!(s, 3)
 s.dict === d           # true: the same Dict, now with the key 3
@@ -546,6 +547,7 @@ add2(extrema([3, 1, 2])...)         # 4, the ... splits the tuple into two argum
 Destructuring by name works the same way:
 
 ```julia
+nt = (x0 = 1, x1 = 4, y0 = 2, y1 = 6)
 slope((; x0, x1, y0, y1)) = (y1 - y0) / (x1 - x0)
 slope(nt)                           # 1.3333333333333333
 ```
@@ -555,6 +557,8 @@ This form suits the `f(x, p)` style, where a named tuple carries a function's pa
 Both types of destructuring also work in a `for` loop:
 
 ```julia
+nt = (x0 = 1, x1 = 4, y0 = 2, y1 = 6)
+
 for (k, v) in Dict("a" => 1)        # by position, from each Pair
     println(k, " ", v)              # a 1
 end
@@ -721,6 +725,7 @@ using DataStructures
 So `Queue` and `Stack` are the two types that do fix the behaviour. Each one is a struct with a single field, `store::Deque{T}`, and it defines only the methods that fit its behaviour. The other operations cause a `MethodError`:
 
 ```julia
+using DataStructures
 q = Queue{Int}()
 push!(q, 1); push!(q, 2); push!(q, 3)
 popfirst!(q)                 # 1
@@ -741,6 +746,7 @@ In both types `first` means the next to come off. For a `Stack` that is the most
 `CircularBuffer` and `CircularDeque` both take a maximum size when you create them. They differ in what happens when they are full. A `CircularBuffer` overwrites its oldest item, which suits keeping the last $n$ items. A `CircularDeque` throws an error:
 
 ```julia
+using DataStructures
 c = CircularBuffer{Int}(3)
 for i in 1:5
     push!(c, i)
@@ -759,6 +765,7 @@ push!(d, 4)                  # BoundsError
 `PriorityQueue` and the heaps, such as `BinaryMinHeap`, are a third kind. They remove by priority, not by position. In these two the smallest number comes off first:
 
 ```julia
+using DataStructures
 pq = PriorityQueue{String,Int}()
 push!(pq, "low" => 3)
 push!(pq, "high" => 1)
@@ -813,7 +820,7 @@ He then writes "Comprehension notation is similar" and gives `[x^3 for x in xs]`
 
 A comprehension is the expression `[x^3 for x in xs]`: it goes through `xs`, evaluates `x^3` for each element, and stores the results in a new array. Julia's manual says "Comprehensions provide a general and powerful way to construct arrays." Written without the square brackets, the same form is a generator (see "What a generator is" below), and a comprehension is that generator passed to `collect`, so `[x^3 for x in xs]` and `collect(x^3 for x in xs)` give the same vector.
 
-Similar is the right word, because the result is a vector and not a set. A mathematical set has no order and no repeats, while a vector has both. Cubes hide most of this, since no two of them are equal, but squares show it. The set of these squares is $\{1, 4\}$, while the comprehension gives:
+Similar is the right word, because the result is a vector and not a set. A mathematical set has no order and no repeats, while a vector has both. In the example given, using cubes hides this difference, since no two of them are equal, but using squares shows this difference. The set of these squares is $\{1, 4\}$, while the comprehension gives:
 
 ```julia
 xs = [-2, -1, 1, 2]
@@ -828,13 +835,13 @@ Set notation often carries a condition as well, such as $\{x^3: x \text{ in } 1,
 
 #### What a generator is
 
-Without the square brackets, `x^3 for x in xs` is a generator. **A generator is not a set, and it is not a vector either.** It is a recipe for producing values one at a time, and something else has to consume it. In `Set(x^3 for x in xs)` the generator is the input, and it is `Set` that makes the set. Assigned to a name by itself, it stays a generator. With `xs = [1, 2, 3, 4, 5]`:
+Without the square brackets, `x^3 for x in xs` is a generator. **A generator is not a set, and it is not a vector either.** It is a recipe for producing values one at a time. Something has to consume the values to make use of them, such as a function like `sum` or a constructor like `Set`. In `Set(x^3 for x in xs)` the generator is the input, and it is `Set` that makes the set. Assigned to a name by itself, it stays a generator. With `xs = [1, 2, 3, 4, 5]`:
 
 | You write | `ys` holds |
 | :--- | :--- |
-| `ys = (x^3 for x in xs)` | a `Base.Generator`, with no values computed yet |
-| `ys = [x^3 for x in xs]` | a `Vector{Int64}` |
-| `ys = Set(x^3 for x in xs)` | a `Set{Int64}` |
+| `ys = (x^2 for x in xs)` | a `Base.Generator`, with no values computed yet |
+| `ys = [x^2 for x in xs]` | a `Vector{Int64}` |
+| `ys = Set(x^2 for x in xs)` | a `Set{Int64}` |
 
 Showing `ys` in the first case prints something like `Base.Generator{Vector{Int64}, var"#20#21"}(var"#20#21"(), [1, 2, 3, 4, 5])`. The `var"#20#21"` is the automatically generated name of the anonymous function holding `x^3`, and its number varies.
 
@@ -850,14 +857,14 @@ sum(ys)                      # 225
 
 #### Comprehension or generator?
 
-A generator keeps a reference to the vector it reads from and computes its values each time it is iterated. So changing the contents of that vector affects the next iteration, while pointing the name `xs` at a different vector does not. A comprehension runs once and stores its results, so neither change affects them:
+A generator keeps a reference to the vector it reads from, not the name, and computes its values each time it is iterated. So mutating the contents of that vector affects the next iteration, while pointing the original name at a different vector does not. By contrast, a comprehension runs once and stores its results, so neither change affects them:
 
 ```julia
 xs = [1, 2, 3]
 g = (x^3 for x in xs)
 v = [x^3 for x in xs]
 
-xs[1] = 10                   # changes the vector that g holds
+xs[1] = 10                   # mutate the vector that g holds
 collect(g)                   # [1000, 8, 27]
 v                            # [1, 8, 27]
 
@@ -866,21 +873,20 @@ collect(g)                   # [1000, 8, 27]
 v                            # [1, 8, 27]
 ```
 
-Computing at different times also gives them different costs:
+Because a comprehension computes when its line runs and a generator only when it is iterated, they also differ in cost:
 
 | Compared on | Comprehension | Generator |
 | :--- | :--- | :--- |
 | When it computes | once, on that line | on each iteration, only as far as needed |
 | `sum` over $10^6$ values | allocates 8 MB | allocates 0 bytes |
-| `any` that succeeds at the third of $10^6$ values | computes all $10^6$ | computes 3 |
 | Going through 3 values twice | computes 3 values in total | computes 6 values in total |
 | Taking the first value with `x[1]` | works | `MethodError` |
 
-So use a comprehension when you need the values more than once or by position, and a generator when they go straight into one function such as `sum`, `any` or `Set`.
+So use a comprehension when you need the values more than once or by position, and a generator when they go straight into one function such as `sum` or `Set`.
 
 #### Getting a `Set`
 
-Julia has no comprehension syntax for sets. You call `Set`, which takes anything that can be iterated over (see "Making a `Set`" above). There is no cast: `convert(Set, [1, 2])` is a `MethodError`.
+Julia has no comprehension syntax for sets. There is also no cast: `convert(Set, [1, 2])` is a `MethodError`. To create one, you call `Set` as a constructor, which takes anything that can be iterated over (see "Making a `Set`" above):
 
 ```julia
 xs = [1, 2, 3, 4, 5]
@@ -903,14 +909,15 @@ Each form addresses a different need:
 - The vector lines up with its inputs: the output in each position belongs to the input in the same position of `xs`. That is what you want for a table of values or a plot.
 - The set holds the values the function reaches on these inputs, which is the image of `xs` under the function.
 
-Comparing sizes tells you whether two different inputs share an output, in other words whether the function is one-to-one on these inputs. Compare with the number of different inputs, `length(Set(xs))`, because `xs` itself may hold repeats:
+Comparing sizes shows you whether two different inputs share an output, in other words whether the function is one-to-one on these inputs. If there is a repeat in `xs`, comparing to `length(xs)` gives the wrong answer. In that case, we need to compare to the number of different inputs by using `length(Set(xs))`, because `xs` itself holds repeats:
 
 ```julia
+xs = [-2, -1, 1, 2]
 length(Set(x^2 for x in xs)), length(Set(xs))    # (2, 4): not one-to-one
 length(Set(x^3 for x in xs)), length(Set(xs))    # (4, 4): one-to-one
 
 xs = [1, 1, 2]
-length(Set(x^3 for x in xs)), length(xs)         # (2, 3): looks not one-to-one, but only because 1 is repeated
+length(Set(x^3 for x in xs)), length(xs)         # (2, 3): looks not one-to-one, but only because 1 is repeated, so use the second test
 length(Set(x^3 for x in xs)), length(Set(xs))    # (2, 2): one-to-one
 ```
 

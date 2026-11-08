@@ -612,6 +612,36 @@ A named reduction and the operator behind it are different functions. Verzani's 
 
 So `+(xs)` is not a sum: it has one argument, nothing to add to it, and it returns `xs`. In the same way, `all` applies "and" across the entries of a collection and `any` applies "or".
 
+### `+` and `sum`, `max` and `maximum`
+
+`+` is to `sum` as `max` is to `maximum`: one combines its arguments, the other combines the entries of a collection. Each pair also connects through `reduce`, and each operator can do the reduction's job by splatting. With `xs = [1, 3, 2]`:
+
+| Job | `+` and `sum` | `max` and `maximum` |
+| :--- | :--- | :--- |
+| On arguments | `+(1, 3, 2)` is `6` | `max(1, 3, 2)` is `3` |
+| On a collection | `sum(xs)` is `6` | `maximum(xs)` is `3` |
+| Through `reduce` | `reduce(+, xs)` is `6` | `reduce(max, xs)` is `3` |
+| By splatting | `+(xs...)` is `6` | `max(xs...)` is `3` |
+| With a function first | `sum(abs2, xs)` is `14` | `maximum(abs2, xs)` is `9` |
+
+The two pairs differ in three places. With `ys = [10, 0, 5]`:
+
+| Case | `+` and `sum` | `max` and `maximum` |
+| :--- | :--- | :--- |
+| The operator on one vector | `+(xs)` returns `xs` | `max(xs)` is a `MethodError` |
+| The operator on two vectors | `+(xs, ys)` is `[11, 3, 7]`, entry by entry | `max(xs, ys)` is `[10, 0, 5]`, one of the two vectors |
+| The reduction on an empty collection | `sum(Int[])` is `0` | `maximum(Int[])` is an `ArgumentError` |
+
+These come from the same fact: `+` has a mathematical meaning on vectors, while `max` only picks one of its arguments (see "With and without the dot" above). So `max(xs, ys)` gives no error. It compares the two vectors in dictionary order and returns the larger one whole. For the larger value in each position, broadcast it:
+
+```julia
+xs = [1, 3, 2]
+ys = [10, 0, 5]
++(xs, ys)                    # [11, 3, 7]: entry by entry
+max(xs, ys)                  # [10, 0, 5]: all of ys, since 1 < 10 decides it
+max.(xs, ys)                 # [10, 3, 5]: the larger value in each position
+```
+
 ### The reductions Julia already provides
 
 Most of these also take a function as their first argument, which they apply to each entry on the way through. That one pass is what `mapreduce` does, without having to name the operator. With `xs = [1, 3, 2]`:

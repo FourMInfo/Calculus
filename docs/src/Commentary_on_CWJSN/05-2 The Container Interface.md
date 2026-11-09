@@ -283,11 +283,17 @@ A generator needs parentheses around it, but a function call's own parentheses c
 
 Below are some details about broadcasting created by Claude and edited by me. All run on Julia 1.13.3.
 
-Verzani says the details of broadcasting allow for more flexibility than the one case he describes, which is one function applied to one vector. He then names three of them in passing: padding "different sized objects to the same shape", fusing "combined function calls", and treating "a container as a scalar-like argument". His examples use only the simplest cases, so this section goes through the details.
+Verzani says the details of broadcasting allow for more flexibility than in the case he describes (one function applied to one vector). He then names three of these "more flexible" features in passing:
+
+1. padding "different sized objects to the same shape",
+2. fusing "combined function calls", and
+3. treating "a container as a scalar-like argument".
+
+This section gives more details on all three as well as other aspects of broadcasting.
 
 ### What the dot does
 
-Writing `f.(args...)` is the same as calling `broadcast(f, args...)`. An operator takes the dot in front of it, as in `xs .^ 2`. This works for any function, including your own, so nobody has to write a separate vector version of a function first. The manual puts it this way: "which functions are vectorizable need not be decided upon in advance by the library writer".
+For a function `f`, writing `f.(args...)` is the same as calling `broadcast(f, args...)`. In contrast, an operator takes the dot in _front_, as in `xs .^ 2`. This works for any function, including your own, so you don't have to write a separate vector version of a function first. The manual puts it this way: "which functions are vectorizable need not be decided upon in advance by the library writer".
 
 ```julia
 f(x) = x^2 + 1
@@ -297,11 +303,13 @@ broadcast(f, xs)             # [2, 5, 10]
 xs .^ 2 .+ 1                 # [2, 5, 10]
 ```
 
-A dotted operator keeps the precedence of the operator, so `1:3 .+ 1` means `1:(3 .+ 1)`, which is `1:4`. Write `(1:3) .+ 1` to get `2:4`. For the dot's other parsing trap, see "`1.`, `2.*3` and the broadcasting dot" on the Number Systems page.
+A dotted operator has the same precedence as its undotted form. For example, `.+` binds as tightly as `+`, which is tighter than `:`. So `1:3 .+ 1` means `1:(3 .+ 1)`, which becomes `1:4`. Write `(1:3) .+ 1` to get `2:4`. For the dot's other parsing trap, see "`1.`, `2.*3` and the broadcasting dot" found on the Number Systems page.
 
 ### With and without the dot
 
-Some operations on vectors and matrices already have a meaning in mathematics, and those work without a dot. So leaving out the dot doesn't always give an error, and the last six rows below show it can give a different answer with no warning. With `xs = [1, 2, 3]`, `ys = [10, 20, 30]` and `A = [1 2; 3 4]`:
+The table below shows how functions and operators work with and without the dot. Without the dot, an operation that has no meaning for vectors gives a `MethodError` (the first four rows). Some operations on vectors and matrices already have a meaning in mathematics and work without a dot. For some of these that meaning gives the same result as the dot (the next three rows), but for others it gives a different answer with no warning (the last six rows).
+
+The table assumes: `xs = [1, 2, 3]`, `ys = [10, 20, 30]` and `A = [1 2; 3 4]`:
 
 | Without the dot | Gives | With the dot | Gives |
 | :--- | :--- | :--- | :--- |
@@ -313,11 +321,14 @@ Some operations on vectors and matrices already have a meaning in mathematics, a
 | `2 * xs` | `[2, 4, 6]` | `2 .* xs` | `[2, 4, 6]` |
 | `xs / 2` | `[0.5, 1.0, 1.5]` | `xs ./ 2` | `[0.5, 1.0, 1.5]` |
 | `2 / xs` | a 1×3 row `r` for which `r * xs` is approximately 2 | `2 ./ xs` | `[2.0, 1.0, 0.666…]` |
-| `A * A` | the matrix product `[7 10; 15 22]` | `A .* A` | `[1 4; 9 16]` |
+| `A * A` | the matrix product `[7 10; 15 22]` | `A .* A` | `[1 4; 9 16]`: the [Hadamard product](https://mathworld.wolfram.com/HadamardProduct.html), written $A \odot A$ |
 | `A ^ 2` | the matrix product `[7 10; 15 22]` | `A .^ 2` | `[1 4; 9 16]` |
 | `sqrt(A)` | a matrix `B` with `B * B` equal to `A`, complex here | `sqrt.(A)` | the square root of each entry |
 | `xs == ys` | `false`: one answer for the whole vector | `xs .== ys` | `Bool[0, 0, 0]` |
 | `[1, 5] < [2, 0]` | `true`: compared in dictionary order | `[1, 5] .< [2, 0]` | `Bool[1, 0]` |
+
+!!! note "The 1×3 row from 2 / xs"
+    The REPL shows `2 / xs` as `1×3 transpose(::Vector{Float64})`. A [transpose](https://fourm.info/linear_algebra/dev/Basics/02%20Matrices/#Transpose) turns rows into columns; Julia's `transpose(v)` returns the vector wrapped so it reads as one row, without copying it. `xs'` is the _adjoint_, a different wrapper shown as `adjoint`: it also takes the complex conjugate of each entry. For real numbers the two hold the same entries and `xs' == transpose(xs)` is `true`, but their types differ.
 
 ### What shape the result has
 

@@ -457,7 +457,20 @@ sin.(cos.(X))                  # [0.8414709848078965, 0.4794255386042031, -0.841
 sin.(cos.(X)) == [sin(cos(x)) for x in X]    # true
 ```
 
-Here is the same calculation on 1000 values, fused and in separate steps:
+Measured, the fused broadcast and the comprehension each allocate one vector, and the same calculation in two steps allocates two. The code goes in functions, each called once before it is measured. At the REPL's top level, `@allocated` would also count compiling the comprehension, about 1.7 MB:
+
+```julia
+fused(X) = sin.(cos.(X))
+comp(X)  = [sin(cos(x)) for x in X]
+steps(X) = (t = cos.(X); sin.(t))
+X = [0, π/3, π]
+fused(X); comp(X); steps(X);    # the first calls compile, so they aren't measured
+@allocated fused(X)             # 80 bytes: one vector
+@allocated comp(X)              # 80 bytes: one vector, the same
+@allocated steps(X)             # 160 bytes: two vectors
+```
+
+Here is a longer calculation on 1000 values, fused and in separate steps:
 
 ```julia
 fused(v) = sqrt.(abs2.(v .- 1.0))

@@ -330,9 +330,9 @@ The table assumes: `xs = [1, 2, 3]`, `ys = [10, 20, 30]` and `A = [1 2; 3 4]`:
 !!! note "The 1×3 row from 2 / xs"
     The REPL shows `2 / xs` as `1×3 transpose(::Vector{Float64})`. A [transpose](https://fourm.info/linear_algebra/dev/Basics/02%20Matrices/#Transpose) turns rows into columns; Julia's `transpose(v)` returns the vector wrapped so it reads as one row, without copying it. `xs'` is the _adjoint_, a different wrapper shown as `adjoint`: it also takes the complex conjugate of each entry. For real numbers the two hold the same entries and `xs' == transpose(xs)` is `true`, but their types differ.
 
-### What shape the result has
+### The shape of the result
 
-For one vector, Verzani says broadcasting returns "a vector of the same size as `xs`". The size follows the argument, but the result is not always a vector. With `f(x) = x^2`:
+For his vector example, Verzani says broadcasting returns "a vector of the same size as `xs`". The size always follows the argument, but the result is not always a vector. With `f(x) = x^2`:
 
 | Argument | `f.(argument)` | Result |
 | :--- | :--- | :--- |
@@ -361,7 +361,7 @@ first.("a" => 1)                                     # "a"
 [1, missing] .+ 1                                    # Union{Missing, Int64}[2, missing]
 ```
 
-Dictionaries and named tuples are in neither group: broadcasting refuses them. To broadcast over what they hold, ask for `values` or `keys`:
+Dictionaries and named tuples are in neither group: broadcasting doesn't work with them directly. To broadcast over what they hold, ask for `values` or `keys`:
 
 ```julia
 d = Dict(:a => 4)
@@ -380,7 +380,12 @@ round.([1.2345, 2.3456], digits = 2)    # [1.23, 2.35]
 
 ### How arguments of different sizes are combined
 
-Verzani says broadcasting "will try to pad out different sized objects to the same shape". Nothing is filled in, though. Julia compares the sizes dimension by dimension, and two sizes fit only if they are equal or one of them is 1. A dimension of length 1 then acts as if its entries were repeated, and a dimension that is missing counts as length 1. The manual says broadcast "expands singleton dimensions in array arguments to match the corresponding dimension in the other array without using extra memory". Any other combination is an error:
+Verzani says broadcasting "will try to pad out different sized objects to the same shape". There is an important nuance here. Julia compares the sizes dimension by dimension. Two sizes fit only if:
+
+1. they are equal or
+2. one of them is 1.
+
+A dimension of length 1 then acts as if its entries are repeated, without actually building it out. A dimension that is missing counts as length 1. The manual says broadcast "expands singleton dimensions in array arguments to match the corresponding dimension in the other array without using extra memory". Any other combination is an error:
 
 | Expression | Sizes | Result |
 | :--- | :--- | :--- |
@@ -394,7 +399,7 @@ Verzani says broadcasting "will try to pad out different sized objects to the sa
 | `(1, 2, 3) .+ (10,)` | (3,) and (1,) | `(11, 12, 13)` |
 | `(1, 2, 3) .+ (10, 20)` | (3,) and (2,) | `DimensionMismatch` |
 
-Rows 3 and 4 differ by one comma: `[10, 20]` is a column and `[10 20]` is a row, so one is an error and the other is a matrix you may not have intended. The same stretching is useful on purpose. A column against a row gives a table of every combination, here the powers 1 to 3 of each of 1, 2 and 3:
+Rows 3 and 4 differ by one comma: `[10, 20]` is a column and `[10 20]` is a row, so one is an error and the other is a matrix. This is useful if it is what you intend to do, so it's important to pay attention. In the example below, we can see the same thing playing out: a column against a row gives a table of every combination, here the powers 1 to 3 of each of 1, 2 and 3:
 
 ```julia
 [1, 2, 3] .^ [1 2 3]         # [1 1 1; 2 4 8; 3 9 27]
@@ -402,9 +407,7 @@ Rows 3 and 4 differ by one comma: `[10, 20]` is a column and `[10 20]` is a row,
 
 ### Keeping a collection whole
 
-Verzani says "there are times where it is desirable to treat a container as a scalar-like argument, a common idiom is to wrap that container in a 1-element tuple", and doesn't show it. His sample variance example, `xs .- mean(xs)`, is a different case. `mean(xs)` is a number, and so is `base` in `log.(base, ys)`, and broadcasting already treats a number as one value. The idiom is for an argument that is itself a collection, which broadcasting would otherwise go through entry by entry.
-
-To wrap a vector, put a comma after it inside parentheses. Without the comma, the parentheses do nothing:
+Verzani says "there are times where it is desirable to treat a container as a scalar-like argument, a common idiom is to wrap that container in a 1-element tuple", but doesn't show an example. His sample variance example, `xs .- mean(xs)`, is a different case. `mean(xs)` is a number, and so is `base` in `log.(base, ys)`. Broadcasting already treats a number as one value. The idiom he mentions is for an argument that is itself a collection, which broadcasting would otherwise go through entry by entry. To wrap a vector, put a comma after it inside parentheses. Without the comma, the parentheses do nothing:
 
 ```julia
 ([2, 3, 4],)                 # ([2, 3, 4],): a tuple with one element, the vector
@@ -420,26 +423,39 @@ in.(xs, [2, 3, 4])           # Bool[0, 0, 0]: compares in(1, 2), in(2, 3), in(3,
 in.([1, 2, 3, 4], [2, 3])    # DimensionMismatch: lengths 4 and 2
 ```
 
-The second line is the dangerous one. With equal lengths nothing fails, and you get a wrong answer. It runs because a number iterates as itself, so `in(1, 2)` is a legal call.
+The second line is the dangerous one. With equal lengths it is iterating element by element, so nothing fails and you get a wrong (or at least unintended) answer. It runs because a number iterates as itself, so e.g. `in(1, 2)` (the first comparison) is a legal call.
 
-Evaluating one polynomial at several points needs the same wrapping, here $1 + 2x^2$ with its coefficients listed from the constant term up:
+Evaluating one polynomial at several points needs the same wrapping. In the example below we use $1 + 2x^2$ with its coefficients listed from the constant term up:
 
 ```julia
 evalpoly.([1, 2, 3], ([1, 0, 2],))    # [3, 9, 19]
 evalpoly.([1, 2, 3], [1, 0, 2])       # MethodError: evalpoly(::Int64, ::Int64)
 ```
 
-`Ref` does the same job, and the book uses both forms later: `find_zero.(f, Ref(I), 1:5)` in the Implications of Continuity chapter, and `(v,)` in the plotting code of the Surface Area chapter. A `Ref` has no dimensions at all, while the tuple has one dimension of length 1. That makes a difference only when nothing else sets the shape of the result:
+`Ref` does the same job, and the book uses both forms later: `find_zero.(f, Ref(I), 1:5)` in the Implications of Continuity chapter, and `(v,)` in the plotting code of the Surface Area chapter. A `Ref` has no dimensions at all, while the tuple has one dimension of length 1. When another argument is a collection, that argument sets the shape of the result, and the two wrappers give the same answer:
 
 ```julia
-in.([1, 2, 3], Ref([2, 3, 4]))    # Bool[0, 1, 1]: the same as the tuple
-length.(([2, 3, 4],))             # (3,): a tuple, by the tuple rule above
-length.(Ref([2, 3, 4]))           # 3
+in.([1, 2, 3], ([2, 3, 4],))      # Bool[0, 1, 1]
+in.([1, 2, 3], Ref([2, 3, 4]))    # Bool[0, 1, 1]: the same
+```
+
+When the wrapped collection is the only argument, the wrapper sets the shape: the tuple gives a one-element tuple, `Ref` gives the value itself:
+
+```julia
+length.(([2, 3, 4],))             # (3,): wrapped in a tuple
+length.(Ref([2, 3, 4]))           # 3: just the number
 ```
 
 ### Fusing
 
-Verzani says broadcasting "can also _fuse_ combined function calls" without saying what that means. Nested dotted calls run as one loop over the entries, and only the final result gets an array. The manual says `sin.(cos.(X))` is "similar to `[sin(cos(x)) for x in X]`: there is only a single loop over `X`, and a single array is allocated for the result", and that this "is not a compiler optimization that may or may not occur, it is a syntactic guarantee". Dotted operators fuse the same way (see `.&&` on the Inequalities and Logical Expressions page).
+Verzani says broadcasting "can also _fuse_ combined function calls" without saying what that means. Nested dotted calls run as one loop over the entries, and only the final result gets an array. The manual says `sin.(cos.(X))` is "similar to `[sin(cos(x)) for x in X]`: there is only a single loop over `X`, and a single array is allocated for the result", and that this "is not a compiler optimization that may or may not occur, it is a syntactic guarantee". Dotted operators fuse the same way (see `.&&` on the Inequalities and Logical Expressions page). The manual's example, run on three values:
+
+```julia
+X = [0, π/3, π]
+sin.(cos.(X))                  # [0.8414709848078965, 0.4794255386042031, -0.8414709848078965]
+[sin(cos(x)) for x in X]       # [0.8414709848078965, 0.4794255386042031, -0.8414709848078965]
+sin.(cos.(X)) == [sin(cos(x)) for x in X]    # true
+```
 
 Here is the same calculation on 1000 values, fused and in separate steps:
 
@@ -452,7 +468,16 @@ fused(xs); steps(xs);        # the first calls compile, so they aren't measured
 @allocated steps(xs)         # 24768 bytes: three vectors
 ```
 
-A call without a dot is not part of the loop. The manual says "the fusion stops as soon as a "non-dot" function call is encountered", and gives `sin.(sort(cos.(X)))` as an example, where `sort` needs the whole vector. Verzani's sample variance shows all of this at once:
+A call without a dot is not part of the loop. The manual says "the fusion stops as soon as a "non-dot" function call is encountered", and gives `sin.(sort(cos.(X)))` as an example, where `sort` needs the whole vector. So `cos.` runs as one loop, `sort` reorders its finished vector, and `sin.` runs as a second loop:
+
+```julia
+X = [0, π/3, π]
+cos.(X)                        # [1.0, 0.5000000000000001, -1.0]
+sort(cos.(X))                  # [-1.0, 0.5000000000000001, 1.0]
+sin.(sort(cos.(X)))            # [-0.8414709848078965, 0.4794255386042031, 0.8414709848078965]
+```
+
+Verzani's sample variance shows all of this at once:
 
 ```julia
 using Statistics: mean

@@ -423,7 +423,7 @@ in.(xs, [2, 3, 4])           # Bool[0, 0, 0]: compares in(1, 2), in(2, 3), in(3,
 in.([1, 2, 3, 4], [2, 3])    # DimensionMismatch: lengths 4 and 2
 ```
 
-The second line is the dangerous one. With equal lengths it is iterating element by element, so nothing fails and you get a wrong (or at least unintended) answer. It runs because a number iterates as itself, so e.g. `in(1, 2)` (the first comparison) is a legal call.
+The second line is the dangerous one. With equal lengths it is iterating element by element, so nothing fails and you get an answer you did not intend. It runs because a number iterates as itself, so e.g. `in(1, 2)` (the first comparison) is a legal call.
 
 Evaluating one polynomial at several points needs the same wrapping. In the example below we use $1 + 2x^2$ with its coefficients listed from the constant term up:
 
@@ -513,22 +513,22 @@ allequal(xs .+ rand.())      # false: rand.() ran once per entry
 
 ### `@.` and `.=`
 
-The macro `@.` puts in the dots for you. The manual says it converts "every function call, operation, and assignment in an expression into the "dotted" version". Verzani uses it in the Exponential and Logarithmic Functions chapter (`@. [n f(n) (a/n - e)]`) with the comment "`@.` just allows broadcasting". Every call means every call, which can be wrong with no warning. In this block `mean` gets dotted too, so each number is averaged with itself. A `$` in front of a function leaves it undotted:
+The macro `@.` puts in the dots for you. The manual says it converts "every function call, operation, and assignment in an expression into the "dotted" version". Verzani uses it in the Exponential and Logarithmic Functions chapter (`@. [n f(n) (a/n - e)]`) with the comment "`@.` just allows broadcasting". Since it is _every_ call, you might get unexpected results. In the block below, `mean` gets dotted too, so each number is averaged with itself. To fix that, put a `$` in front of a function which you want undotted:
 
 ```julia
 using Statistics: mean
 xs = [1, 2, 3]
 @. sqrt(abs2(xs - 1))        # [0.0, 1.0, 2.0]: the same as sqrt.(abs2.(xs .- 1))
-@. xs - mean(xs)             # [0.0, 0.0, 0.0]: wrong, this is xs .- mean.(xs)
+@. xs - mean(xs)             # [0.0, 0.0, 0.0]: not what was meant, this is xs .- mean.(xs)
 @. xs - $mean(xs)            # [-1.0, 0.0, 1.0]: the same as xs .- mean(xs)
 ```
 
-The assignment `.=` writes into a vector that already exists, while `=` points the name at a new one (see "Values, names and symbols" on the Vectors and Containers page). So `.=` changes what every name for that vector sees:
+The assignment `.=` writes new values into a vector that already exists. Every name that points to that vector shows the changes. By contrast, `=` points a name at a new vector (see "Values, names and symbols" on the Vectors and Containers page). So a change in one named vector will not affect the other named vector:
 
 ```julia
 xs = [1, 2, 3]
 ys = xs
-ys .= xs .* 2                # overwrites the vector both names point to
+ys .= xs .* 2                # overwrites the values in the vector both names point to
 xs                           # [2, 4, 6]
 ys === xs                    # true
 
@@ -539,7 +539,7 @@ xs                           # [1, 2, 3]
 ys === xs                    # false
 ```
 
-It fuses as well, so with `v` already in existence, `v .= sqrt.(abs2.(xs .- 1.0))` allocated 0 bytes, where the fused version above allocated 8256. Since it writes into the existing vector, `.=` can't change that vector's size:
+`.=` fuses as well, so with `v` already in existence, `v .= sqrt.(abs2.(xs .- 1.0))` allocates 0 bytes, where the fused version above allocated 8256. Since it writes into the existing vector, `.=` can't change that vector's size:
 
 ```julia
 xs = [1, 2, 3]
@@ -552,11 +552,11 @@ xs .= [1, 2]                 # DimensionMismatch: lengths 3 and 2
 
 Below are some details about `map` created by Claude and edited by me. All run on Julia 1.13.3.
 
-Verzani says `map` "is very much related to broadcasting" and that `map(sin, xs)` computes "the same things as `sin.(xs)`". He doesn't say where they differ, and they differ in ways that can give a wrong answer with no error.
+Verzani says `map` "is very much related to broadcasting" and that `map(sin, xs)` computes "the same things as `sin.(xs)`". He doesn't say where they differ, or that they differ in ways that can give an unexpected answer with no error.
 
 ### Where they agree
 
-For one vector, or for vectors of the same length, they give the same values at the same cost (see the table in "Broadcast or `mapreduce`? The trade-offs" below):
+For one vector, or for vectors of the same length, they give the same values at the same cost (for costs, see the table in "Broadcast or `mapreduce`? The trade-offs" below):
 
 ```julia
 xs = [1, 2, 3]
@@ -567,7 +567,7 @@ xs .+ [10, 20, 30]           # [11, 22, 33]
 
 ### Different sizes: `map` stops, broadcasting stretches
 
-The docstring for `map` says it applies the function "elementwise, and stop when any of them is exhausted", and that `broadcast` "allows mismatched sizes". So where broadcasting stretches a length-1 argument or refuses, `map` takes only as many entries as the shortest argument has:
+The docstring for `map` says it applies the function "elementwise, and stop when any of them is exhausted", and that `broadcast` "allows mismatched sizes". So where broadcasting stretches a length-1 argument to match the other or stops with a `DimensionMismatch`, `map` takes only as many entries as the shortest argument has:
 
 | `a` | `b` | `map(+, a, b)` | `a .+ b` |
 | :--- | :--- | :--- | :--- |
@@ -611,21 +611,12 @@ with_dots(xs); with_maps(xs);    # the first calls compile, so they aren't measu
 
 `map` does have an in-place form, like `.=` (see "`@.` and `.=`" above): `map!(sin, w, v)` also allocated 0 bytes. It doesn't fuse, though, so it takes one function.
 
-The 1-element tuple from "Keeping a collection whole" only works for broadcasting, because only broadcasting stretches it. In `map` the tuple is the shortest argument, so `map` stops after one entry. To keep a collection whole in `map`, put it inside the function:
+The 1-element tuple discussed in "Keeping a collection whole" only works for broadcasting, because only broadcasting stretches it. In `map` the tuple is the shortest argument, so `map` stops after one entry. To keep a collection whole in `map`, put it inside an anonymous function:
 
 ```julia
 in.([1, 2, 3], ([2, 3, 4],))           # Bool[0, 1, 1]
 map(in, [1, 2, 3], ([2, 3, 4],))       # Bool[0]: stops after one entry
 map(x -> x in [2, 3, 4], [1, 2, 3])    # Bool[0, 1, 1]
-```
-
-In the other direction, `map` can take a longer function written in place with a `do` block, which has no dotted form. The function has to be named first in order to broadcast it:
-
-```julia
-map([1, 2, 3]) do x
-    y = x^2
-    y + 1
-end                          # [2, 5, 10]
 ```
 
 ### Which one to use
@@ -636,7 +627,6 @@ end                          # [2, 5, 10]
 | A number or other parameter alongside a vector | `xs .+ 10` | `map(+, xs, 10)` drops entries with no error |
 | Vectors that must have the same length | `xs .+ ys` | A length mismatch is an error, where `map` drops entries |
 | Several steps in one expression | `sin.(cos.(xs))` | It fuses into one loop and one vector |
-| A function longer than one line | `map(xs) do x … end` | It needs no separate name |
 | A named tuple, keeping its names | `map(sqrt, nt)` | Broadcasting refuses it |
 | Stopping at the shortest collection on purpose | `map(+, xs, ys)` | That's what `map` is defined to do |
 

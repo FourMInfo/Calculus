@@ -638,9 +638,9 @@ Below are some details about reductions created by Claude and edited by me. All 
 
 Verzani says "Reductions take a container with one or more dimensions and reduces the number of dimensions". Broadcasting keeps the shape of its arguments, while a reduction combines the entries of a collection into one value.
 
-He introduces `map` "in combination with `reduce`, a reduction", then `mapreduce`, then "other specialized reduction functions" such as `sum` and `maximum`. This suggests that `reduce` and `mapreduce` are the tools to reach for, with the others as extras. It is closer to the opposite, though he never says so: **`reduce` is the general tool, and Julia gives the common reductions their own names, so you rarely need to write `reduce` or `mapreduce` at all.** The chapter itself never calls `reduce`. Its example of `map` in combination with `reduce` is `sum(map(sin, xs))`.
+He introduces `map` "in combination with `reduce`, a reduction", then `mapreduce`, then "other specialized reduction functions" such as `sum` and `maximum`. This suggests that `reduce` and `mapreduce` are the go-to tools, with the others as extras. In reality it is the opposite. While **`reduce` is the general tool, Julia gives the common reductions their own names, so you rarely need to write `reduce` or `mapreduce` at all.** The chapter itself never calls `reduce`. Its example of `map` in combination with `reduce` is `sum(map(sin, xs))`.
 
-A named reduction and the operator behind it are different functions. Verzani's note on `max` and `maximum` makes this point for that one pair, and it holds for the others too. The operator combines its arguments, and the reduction combines the entries of a collection:
+A named reduction and the operator behind it are different functions. Verzani's note on `max` and `maximum` makes this point for that one pair, but it holds for the others too. The operator combines its arguments, and the reduction combines the entries of a collection:
 
 | Operator, on its arguments | Reduction, on a collection | The same reduction in general form |
 | :--- | :--- | :--- |
@@ -653,7 +653,7 @@ So `+(xs)` is not a sum: it has one argument, nothing to add to it, and it retur
 
 ### `+` and `sum`, `max` and `maximum`
 
-`+` is to `sum` as `max` is to `maximum`: one combines its arguments, the other combines the entries of a collection. Each pair also connects through `reduce`, and each operator can do the reduction's job by splatting. With `xs = [1, 3, 2]`:
+Let's dive deeper into operators and their reduction functions. `+` is to `sum` as `max` is to `maximum`: one combines its arguments, the other combines the entries of a collection. Each pair also connects through `reduce`, and each operator can do the reduction's job by splatting. With `xs = [1, 3, 2]`:
 
 | Job | `+` and `sum` | `max` and `maximum` |
 | :--- | :--- | :--- |
@@ -698,7 +698,7 @@ Most of these also take a function as their first argument, which they apply to 
 | `argmin` | see below | `1` | `1` |
 | `mean`, from `Statistics` | the average | `2.0` | `4.666…` |
 
-`argmax` needs care, because the two forms answer different questions. `argmax(xs)` gives the position of the largest value. `argmax(f, xs)` gives the entry of `xs` for which `f` is largest, not its position. Verzani's `v = [1, 2, 3, 4]` hides this because each entry equals its own position, so a different order is needed to see it. To get the position when applying a function, use `findmax(f, xs)` or `argmax(f.(xs))`:
+`argmax` needs care, because the two forms act in different ways: `argmax(xs)` gives the position of the largest value. `argmax(f, xs)` gives the entry of `xs` for which `f` is largest, not its position. Verzani's example `v = [1, 2, 3, 4]` hides this because each entry equals its own position, so a different order is needed to see it. To get the position when applying a function, use `findmax(f, xs)` or `argmax(f.(xs))`:
 
 ```julia
 v = [3, 4, 1, 2]
@@ -707,7 +707,7 @@ argmax(sin.(v))              # 4: the position of that entry
 findmax(sin, v)              # (0.9092974268256817, 4): the value and the position
 ```
 
-The functions for truth values work the same way. Verzani calls `iseven` a _predicate_ function, one that returns `true` or `false`:
+The reductions for truth values work the same way. They can also take a _predicate_ function—one that returns `true` or `false`—and apply it first, for example `iseven`:
 
 | Function | Gives | On `[true, false, true]` | `f(iseven, [1, 3, 2])` |
 | :--- | :--- | :--- | :--- |
@@ -717,7 +717,7 @@ The functions for truth values work the same way. Verzani calls `iseven` a _pred
 
 `any` and `all` also stop as soon as the answer is settled. Counting the calls on `[2, 1, 3, 5]`, `any(iseven, v)` called `iseven` once, while `reduce(|, iseven.(v))` called it 4 times.
 
-For a matrix, these functions take `dims` to reduce along one dimension. The dimension stays, with length 1:
+For a matrix, these reduction functions take `dims` to reduce along one dimension. The dimension stays, with length 1:
 
 ```julia
 A = [1 2; 3 4]
@@ -727,7 +727,7 @@ sum(A; dims = 2)             # [3; 7;;]: one column, the total of each row
 maximum(A; dims = 1)         # [3 4]
 ```
 
-An empty collection needs a starting value from somewhere. Verzani mentions this for `sum` and `prod`. `sum`, `prod`, `any`, `all` and `count` have an obvious answer for it. `maximum` has none, so you must supply `init`:
+An empty collection needs a starting value. Verzani mentions this for `sum` and `prod`. `sum`, `prod`, `any`, `all` and `count` have an obvious starting value. `maximum` doesn't, so you must supply `init`:
 
 ```julia
 sum(Int[])                   # 0
@@ -749,7 +749,7 @@ reduce(hcat, [[1, 2], [3, 4]])    # [1 3; 2 4]
 
 It's worth checking for a named version first. `gcd` and `lcm` both take a vector directly, so `gcd([12, 18, 30])` gives `6` with no `reduce`, and `join(["a", "b"])` gives `"ab"`.
 
-Use `mapreduce` when you also need to apply a function on the way, and the operator still has no named reduction:
+Use `mapreduce` when you also need to apply a function on the way, and the operator has no named reduction:
 
 ```julia
 mapreduce(collect, vcat, [1:2, 3:4])    # [1, 2, 3, 4]

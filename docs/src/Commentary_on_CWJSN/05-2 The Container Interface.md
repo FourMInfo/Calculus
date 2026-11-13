@@ -823,3 +823,35 @@ calls[] = 0
 sum(abs2(x - counted_mean(xs)) for x in xs)
 calls[]                      # 1000
 ```
+
+## CWJSN vectors: Questions
+
+Values marked * were not in my REPL session; they were added afterwards by Claude to complete the comparison. As always, try to answer on your own before looking at the answers.
+
+| Q | Question (CWJSN) | My Julia → result | Answer | Why |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | Which command creates the vector $\vec{v} = \langle 4,~3 \rangle$: `v = [4,3]`, `v = {4, 3}`, `v = '4, 3'`, `v = (4,3)` or `v = <4,3>`? | `v = [4, 3]` → `2-element Vector{Int64}`; `v = {4, 3}` → `ERROR: syntax: { } vector syntax is discontinued`; `v = '4, 3'` → `ERROR: ParseError` (character literal contains multiple characters); `v = <4, 3>` → `ERROR: ParseError` (not a unary operator); `v = (4, 3)` → `(4, 3)` | `v = [4,3]` | square brackets with commas build a `Vector`. Braces are no longer vector syntax; single quotes make a `Char`, a single character; `<` compares two values, and with nothing on its left Julia looks for a one-argument `<`, which does not exist; `(4, 3)` builds a `Tuple`, not a `Vector` |
+| 2 | Which command creates the vector with components 4, 3, 2, 1: `v = [4,3,2,1]`, `v = (4,3,2,1)`, `v = {4,3,2,1}`, `v = '4, 3, 2, 1'` or `v = <4,3,2,1>`? | `v = [4, 3, 2, 1]` → `4-element Vector{Int64}`; `v = (4, 3, 2, 1)` → `(4, 3, 2, 1)`; `v = '4, 3, 2, 1'`, `v = <4, 3, 2, 1>` and `v = {4, 3, 2, 1}` → the same errors as in Q1 | `v = [4,3,2,1]` | as in Q1 |
+| 3 | What is the magnitude of $\vec{v} = \langle 10,~15 \rangle$? | `norm([10,15])` → `ERROR: UndefVarError: norm not defined in Main`; `using LinearAlgebra`; `norm([10,15])` → `18.027756377319946` | $5\sqrt{13} \approx 18.0278$ | $\sqrt{10^2 + 15^2} = \sqrt{325}$. `norm` comes from the standard library `LinearAlgebra`: `using CalculusWithJuliaSquared` loads it, a bare REPL needs `using LinearAlgebra` |
+| 4 | Which is the unit vector in the direction of $\vec{v} = \langle 3,~4 \rangle$: `[3, 4]`, `[0.6, 0.8]`, `[1.0, 1.33333]` or `[1, 1]`? | `norm([3,4])/[3,4]` → `1×2 transpose(::Vector{Float64})`: `0.6  0.8`; `[3, 4] / norm([3, 4])` → `[0.6, 0.8]`\* | `[0.6, 0.8]` | the unit vector is $\vec{v} / \lVert\vec{v}\rVert = \langle 3, 4 \rangle / 5$. My line divides the other way round, a number by a vector, which Julia defines as `x * pinv(v)`: the 1×2 row `r` for which `r * [3, 4]` is 5 (see the note under [With and without the dot](#With-and-without-the-dot)). When the number is $\lVert\vec{v}\rVert$, that row always holds the entries of the unit vector, so the answer came out the same |
+| 5 | Which vector has the direction of $\vec{v} = \langle 3,~4 \rangle$ but is 10 times as long: `[3, 4]`, `[30, 40]`, `[9.48683, 12.6491]` or `[10, 10]`? | `10 * [3, 4]` → `[30, 40]`\*; `norm([30, 40]) / norm([3, 4])` → `10.0`\*; `norm([9.48683, 12.6491]) / norm([3, 4])` → `3.1622756000001013`\*; `norm([10, 10]) / norm([3, 4])` → `2.8284271247461903`\* | `[30, 40]` | multiplying by 10 makes the vector 10 times as long and keeps its direction. `[9.48683, 12.6491]` is $\sqrt{10}\,\langle 3, 4 \rangle$, only $\sqrt{10}$ times as long; `[10, 10]` points in another direction; `[3, 4]` is $\vec{v}$ itself |
+| 6 | If $\vec{v} = \langle 3,~4 \rangle$ and $\vec{w} = \langle 1,~2 \rangle$, what is $2\vec{v} + 5\vec{w}$? | `2*[3,4] + 5*[1,2]` → `[11, 18]` | `[11, 18]` | entry by entry: $2 \cdot 3 + 5 \cdot 1 = 11$ and $2 \cdot 4 + 5 \cdot 2 = 18$ |
+| 7 | For `v = [1, 1, 2, 3, 5, 8, 13, 21]`, what are the length, the `sum` and the `prod` of `v`? | `norm(v)` → `26.720778431774775`; `length(v)` → `8`; `sum(v)` → `54`; `prod(v)` → `65520` | 8, 54 and 65520 | "length" here means the number of entries, `length(v)`, not the magnitude `norm(v)` |
+| 8 | The figure shows five vectors. Express **c**, **d** and **e** in terms of **a** and **b**: `3a`, `3b`, `a + b`, `a - b` or `b-a`? | coordinates I read off the figure: `a = [1.0, 0]`, `b = [0.5, -1.0]`, `c = [3.0, 0]`, `d = [1.5, -1.0]`, `e = [0.5, 1]`; `3a == c` → `true`; `a+b == d` → `true`; `a - b == e` → `true` | **c** = `3a`, **d** = `a + b`, **e** = `a - b` | see the code below the table |
+| 9 | If `xs=[1, 2, 3, 4]` and `f(x) = x^2`, which will not produce `[1, 4, 9, 16]`: `f.(xs)`, `map(f, xs)`, `[f(x) for x in xs]`, or "All three of them work"? | `f.(xs)`, `map(f, xs)` and `[f(x) for x in xs]` → each `[1, 4, 9, 16]` | All three of them work | broadcasting, `map` and a comprehension each apply `f` to every entry (see [`map` and broadcasting](#map-and-broadcasting)) |
+| 10 | The zeros of $g(x) = \cos(x)$ in $[0, 2\pi]$ are `zs = [pi/2, 3pi/2]`. Which gives the values of $f(x) = \sin(x)$ at them: `sin(zs)`, `sin.(zs)`, `sin(.zs)` or `.sin(zs)`? | `sin.(zs)` → `[1.0, -1.0]`; `sin(zs)` → `ERROR: MethodError: no method matching sin(::Vector{Float64})`; `sin(.zs)` and `.sin(zs)` → `ERROR: ParseError` (invalid identifier) | `sin.(zs)` | `sin` takes one number, so it has to be broadcast. In a function call the dot goes between the function's name and the opening parenthesis |
+| 11 | If `zs = [1,4,9,16]`, which returns `[1.0, 2.0, 3.0, 4.0]`: `sqrt(zs)`, `sqrt.(zs)`, `zs^(1/2)` or `zs^(1./2)`? | `sqrt.(zs)` → `[1.0, 2.0, 3.0, 4.0]`; `sqrt(zs)` → `ERROR: MethodError: no method matching sqrt(::Vector{Int64})`; `zs^(1/2)` → `ERROR: MethodError: no method matching ^(::Vector{Int64}, ::Float64)`; `zs^(1./2)` → `ERROR: ParseError` (ambiguous `.` syntax); `zs.^(1/2)` → `[1.0, 2.0, 3.0, 4.0]` | `sqrt.(zs)` | `sqrt` and `^` take numbers, not vectors. `1./2` could mean `1.0/2` or `1 ./ 2`, so Julia refuses to guess. Verzani left out `zs.^(1/2)`, which also works: the dot on the operator broadcasts `^` |
+
+**Q8 (the figure)**, every option against each vector, with the coordinates I read off the figure. Only the three `true` comparisons above were in my session:
+
+```julia
+a, b = [1.0, 0], [0.5, -1.0]
+c, d, e = [3.0, 0], [1.5, -1.0], [0.5, 1]
+options = [3a, 3b, a + b, a - b, b - a]
+options .== Ref(c)   # Bool[1, 0, 0, 0, 0]: only 3a *
+options .== Ref(d)   # Bool[0, 0, 1, 0, 0]: only a + b *
+options .== Ref(e)   # Bool[0, 0, 0, 1, 0]: only a - b *
+b - a == -e          # true: b - a has the length of e but points the opposite way *
+```
+
+My coordinates are not the figure's. Verzani draws the vectors on a grid of equilateral triangles; I moved them onto ordinary $x, y$ axes, where the numbers are simpler. A vector can be moved anywhere without changing it, so each one can start at the origin. I also gave **b**, **d** and **e** a height of 1, where the figure's own code has $\sqrt{3}/2 \approx 0.866$ (it draws **b** as `(1/2, -sqrt(3)/2)`). That stretches the $y$ axis, and stretching an axis keeps every sum and multiple: if $\vec{c} = 3\vec{a}$ before, it still is after. So the answers are the same, and the arithmetic is easier.

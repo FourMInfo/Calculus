@@ -43,6 +43,7 @@ makedocs(;
             "Commentary_on_CWJSN/04 Inequalities and Logical Expressions.md",
             "Commentary_on_CWJSN/05-1 Vectors and Containers.md",
             "Commentary_on_CWJSN/05-2 The Container Interface.md",
+            "Commentary_on_CWJSN/06 Ranges and Sets.md",
         ],
         "sites.md",
     ],

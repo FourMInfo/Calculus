@@ -180,6 +180,28 @@ filter(f, 1:30)    # [7, 14, 21, 28]
 
 The plain `x -> x % 7 == 0` does the same and reads more easily. What the fancy form gains is that it shows how it is built: it prints as `Base.Fix2{ComposedFunction{typeof(iszero), typeof(rem)}, Int64}(iszero ∘ rem, 7)`, while an anonymous function prints only as a generated name such as `#2`.
 
+#### Filtering for primes, and a faster way
+
+Verzani calls `filter(isprime, 100:200)` "an inefficient way to list the prime numbers between $100$ and $200$" without saying why. `filter` tests every number of the range on its own, and `isprime` does not use what it learned about the numbers before. How it tests one number depends on its size (`Primes` 0.5.7 source): below $2^{16}$ it looks the number up in a table of smallest factors; below $2^{32}$ it divides by the primes 3 to 23 and then runs a Miller–Rabin test; above that it runs Miller–Rabin and a Lucas test.
+
+The same package has `primes(lo, hi)`, which lists the primes from `lo` to `hi` with a sieve (the source cites the Sieve of Eratosthenes and wheel factorization). A sieve crosses out the multiples of each small prime once, up to $\sqrt{hi}$, so no number is tested on its own. Both give the same list:
+
+```julia
+using Primes
+filter(isprime, 100:200) == primes(100, 200)    # true: the same 21 primes
+```
+
+Measured on an Apple M4 Pro, the fastest of several runs:
+
+| Range | `filter(isprime, ...)` | `primes(lo, hi)` | `filter` takes |
+| :--- | :--- | :--- | :--- |
+| `100:200` | 0.17 μs | 0.083 μs | 2 times as long |
+| `1:10^6` | 16 ms | 0.73 ms | 22 times as long |
+| `1:10^8` | 2.1 s | 87 ms | 24 times as long |
+| `10^12:10^12 + 10^6` | 129 ms | 2.0 ms | 64 times as long |
+
+For Verzani's range the difference does not matter. It grows with the length of the range, and more with the size of the numbers, because each `isprime` call on a large number runs the costlier tests, while the sieve only needs the primes up to $\sqrt{hi}$.
+
 #### `filter` or `if`
 
 Verzani gets the multiples of 7 both with `filter` and with an `if` in a comprehension. His note after the generator example names the difference: `filter` takes a function, while the `if` takes an expression. On a range the two give the same vector:

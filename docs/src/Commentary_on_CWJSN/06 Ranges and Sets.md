@@ -145,3 +145,137 @@ g isa AbstractVector        # false
 | Is an `AbstractVector` | yes | no |
 
 The indexing is what makes a range express a sequence: like the sequence, it can give you any term by its position, without going through the terms before it.
+
+## Modifying sequences
+
+Below are some details about filtering, comprehensions and generators created by Claude. The results are from Julia 1.13.4.
+
+Verzani's section "Modifying sequences" makes a new sequence from an old one in three ways: `filter`, comprehensions and generators. Comprehensions and generators were first covered in [Generators and sets](05-2 The Container Interface.md#Generators-and-sets) on The Container Interface page. The sections below add only what this chapter brings that the earlier page does not.
+
+### Filtering
+
+`filter(pred, collection)` keeps the elements for which the function `pred` returns `true`. A function that returns `true` or `false` is called a _predicate_ (see [The reductions Julia already provides](05-2 The Container Interface.md#The-reductions-Julia-already-provides)). On a range or a vector, the result is a new `Vector`:
+
+```julia
+filter(iseven, 0:25)    # [0, 2, 4, …, 24], a Vector{Int64}
+```
+
+#### A predicate for divisibility by 7
+
+Verzani gives two ways to write the predicate he needs: `is_seven(x) = x%7 == 0` and, "if being fancy", `Base.Fix2(iszero∘rem, 7)`. Both answer "does 7 divide `x`?". The second builds the function from existing ones. Read it from the inside out:
+
+| Piece | What it is | Example |
+| :--- | :--- | :--- |
+| `rem` | the remainder of dividing its first argument by its second | `rem(15, 7)` → `1` |
+| `iszero ∘ rem` | `∘` (typed `\circ` Tab) composes two functions: `(f ∘ g)(args...)` is `f(g(args...))`, and all the arguments go to `g` | `(iszero ∘ rem)(14, 7)` is `iszero(rem(14, 7))` → `true` |
+| `Base.Fix2(f, 7)` | a function with `7` fixed as the _second_ argument of `f`: calling it with `x` runs `f(x, 7)` | `Base.Fix2(iszero∘rem, 7)(15)` → `false` |
+
+The `2` in `Fix2` names the position that is fixed, not the number of arguments: `Base.Fix1(rem, 7)` is `x -> rem(7, x)`. The general form `Base.Fix{N}` fixes the `N`th argument, and `Base.Fix2 === Base.Fix{2}` is `true`. Any further arguments fill the remaining positions in order. `Fix2` is public but not exported, hence the `Base.` prefix.
+
+```julia
+f = Base.Fix2(iszero∘rem, 7)
+f(14), f(15)       # (true, false)
+filter(f, 1:30)    # [7, 14, 21, 28]
+```
+
+The plain `x -> x % 7 == 0` does the same and reads more easily. What the fancy form gains is that it shows how it is built: it prints as `Base.Fix2{ComposedFunction{typeof(iszero), typeof(rem)}, Int64}(iszero ∘ rem, 7)`, while an anonymous function prints only as a generated name such as `#2`.
+
+#### `filter` or `if`
+
+Verzani gets the multiples of 7 both with `filter` and with an `if` in a comprehension. His note after the generator example names the difference: `filter` takes a function, while the `if` takes an expression. On a range the two give the same vector:
+
+```julia
+filter(k -> rem(k, 7) == 0, 1:100) == [k for k in 1:100 if rem(k, 7) == 0]    # true
+```
+
+The difference shows when the values go straight into a reduction. `sum(filter(isprime, 1:100))` first stores the primes in a vector and then adds them, while `sum(p for p in 1:100 if isprime(p))` adds them as they come. Both give `1060`; inside a function, after a first call, the first allocates 1184 bytes and the second none. (`isprime` comes from the `Primes` package, which the Calculus notebook environment now includes.)
+
+`filter` also does not take a generator: `filter(iseven, (x^2 for x in 1:5))` is a `MethodError`. `Iterators.filter` takes any iterable and returns another iterator, which computes nothing until it is iterated:
+
+```julia
+collect(Iterators.filter(iseven, (x^2 for x in 1:5)))    # [4, 16]
+```
+
+### Comprehensions
+
+The basics are in [Set notation and comprehensions](05-2 The Container Interface.md#Set-notation-and-comprehensions) and [Comprehension or generator?](05-2 The Container Interface.md#Comprehension-or-generator?) on The Container Interface page. This chapter adds three things: several `for` clauses, a `for` over a single number, and choosing the element type.
+
+#### Several `for` clauses
+
+Verzani's "Making change" example chains four `for` clauses. Each later clause runs once for every value of the clauses before it and can use their variables: `d` runs up to `100 - q`. The result is one flat vector. Separating the clauses with commas instead gives an array with one dimension per clause, and then no range may use another clause's variable:
+
+```julia
+[(a, b) for a in 1:2 for b in 1:3]    # 6-element Vector: (1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3)
+[(a, b) for a in 1:2, b in 1:3]       # 2×3 Matrix: a picks the row, b the column
+[(a, b) for a in 1:3 for b in a:3]    # [(1, 1), (1, 2), (1, 3), (2, 2), (2, 3), (3, 3)]: b starts at a
+[(a, b) for a in 1:3, b in a:3]       # UndefVarError: `a` not defined
+```
+
+| Form | Result | A later range may use an earlier variable |
+| :--- | :--- | :--- |
+| `for a in A for b in B` | a flat vector, `a` changing slowest | yes |
+| `for a in A, b in B` | a `length(A)`×`length(B)` matrix | no |
+
+An `if` at the end of the chain tests every combination, as in Verzani's `if q > d > n > p`.
+
+#### A `for` over a single number
+
+The last clause of the making-change comprehension, `for p = (100 - q - d - n)`, iterates over one number. A number in `Julia` is iterable and yields itself once, so this clause just sets `p` to the amount that brings the total to 100. In a chain it adds one element per combination; on its own it gives a zero-dimensional array, not a vector:
+
+```julia
+[(q, p) for q in 1:2 for p = 10 - q]    # [(1, 9), (2, 8)]
+[p for p = 5]                           # fill(5), an Array{Int64, 0}
+```
+
+Verzani writes `=` in this example and `in` elsewhere. In a `for` clause `=`, `in` and `∈` mean the same.
+
+#### Choosing the element type
+
+Verzani writes: "Sometimes, the comprehension does not produce the type of output that may be expected. This is related to `Julia`'s more limited abilities to infer types at the command line. If the output type is important, the extra prefix of `T[]` can be used, where `T` is the desired type." Here is a comprehension whose values mix integers and floating point numbers:
+
+```julia
+[iseven(x) ? x : x/2 for x in 1:4]           # Real[0.5, 2, 1.5, 4]
+[0.5, 2, 1.5, 4]                             # [0.5, 2.0, 1.5, 4.0]: a literal promotes
+Float64[iseven(x) ? x : x/2 for x in 1:4]    # [0.5, 2.0, 1.5, 4.0]
+```
+
+A literal vector converts mixed numbers to one common type. A comprehension does not: its element type is a common supertype of the values it produced, here `Real`, and for a number and a string `Any`. The same function body gives `Vector{Real}` inside a function too, so in `Julia` 1.13 the command line is not what causes it. Type inference decides the element type only when there are no values: `[x for x in 1:3 if x > 5]` is an empty `Vector{Int64}`.
+
+The `T[...]` prefix converts each value to `T`, and fails when a value cannot be converted exactly:
+
+```julia
+Int[x/2 for x in 2:2:6]    # [1, 2, 3]
+Int[x/2 for x in 1:3]      # InexactError: 0.5 is not an integer
+```
+
+### Generators
+
+The basics are in [What a generator is](05-2 The Container Interface.md#What-a-generator-is), [Comprehension or generator?](05-2 The Container Interface.md#Comprehension-or-generator?) and [When the parentheses can be left out](05-2 The Container Interface.md#When-the-parentheses-can-be-left-out) on The Container Interface page, and in [A range is not a generator](#A-range-is-not-a-generator) above. This chapter adds which functions take a generator, what an `if` changes, and counting without storing.
+
+#### Which functions take a generator
+
+Verzani writes: "Not all functions allow generators as arguments, but most common reductions do." With `g = (x^2 for x in 1:5)` and the filtered `h = (x^2 for x in 1:5 if isodd(x))`:
+
+| Function | `g` | `h`, with an `if` |
+| :--- | :--- | :--- |
+| `sum`, `maximum`, `first`, `last` | `55`, `25`, `1`, `25` | `35`, `25`, `1`, `25` |
+| `collect`, `unique`, `Set`, `map(sqrt, ...)`, `sqrt.(...)` | work | work |
+| `length`, `size` | `5`, `(5,)` | `MethodError` |
+| `findfirst(iseven, ...)` | `2` | `MethodError` |
+| `sort`, `reverse`, `filter(iseven, ...)` | `MethodError` | `MethodError` |
+| indexing, `g[1]` | `MethodError` | `MethodError` |
+
+The functions that work go through the values once, from the first. `sort` and `reverse` need all the values at once, so `collect` the generator first. The `if` costs the generator its length: how many values pass the test is only known once they have been computed. So the `length` row in the range-versus-generator table above holds only for a generator without an `if`.
+
+#### Counting without storing
+
+Verzani stores all 242 ways to make change and then counts them with `length(ways)`. If only the count is wanted, a generator with the same `for` clauses counts without storing them:
+
+```julia
+sum(1 for q = 0:25:100
+      for d = 0:10:(100 - q)
+      for n = 0:5:(100 - q - d)
+      for p = (100 - q - d - n))    # 242
+```
+
+Inside a function, after a first call, this allocates 928 bytes, and the comprehension with `length` 28208 bytes. Generators take several `for` clauses just like comprehensions, in both forms: `sum(a*b for a in 1:2 for b in 1:3)` and `sum(a*b for a in 1:2, b in 1:3)` are both `18`.

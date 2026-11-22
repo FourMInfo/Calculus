@@ -148,7 +148,7 @@ The indexing is what makes a range express a sequence: like the sequence, it can
 
 ## Modifying sequences
 
-Below are some details about filtering, comprehensions and generators created by Claude. The results are from Julia 1.13.4.
+Below are some details about filtering, comprehensions and generators created by Claude and edited by me. The results are from Julia 1.13.4.
 
 Verzani's section "Modifying sequences" makes a new sequence from an old one in three ways: `filter`, comprehensions and generators. Comprehensions and generators were first covered in [Generators and sets](05-2 The Container Interface.md#Generators-and-sets) on The Container Interface page. The sections below add only what this chapter brings that the earlier page does not.
 
@@ -166,8 +166,8 @@ Verzani gives two ways to write the predicate he needs: `is_seven(x) = x%7 == 0`
 
 | Piece | What it is | Example |
 | :--- | :--- | :--- |
-| `rem` | the remainder of dividing its first argument by its second | `rem(15, 7)` → `1` |
-| `iszero ∘ rem` | `∘` (typed `\circ` Tab) composes two functions: `(f ∘ g)(args...)` is `f(g(args...))`, and all the arguments go to `g` | `(iszero ∘ rem)(14, 7)` is `iszero(rem(14, 7))` → `true` |
+| `rem` | a function that gives the remainder resulting from dividing its first argument by its second | `rem(15, 7)` → `1` |
+| `iszero ∘ rem` | a composition of two functions, where you apply the one on the right first. The symbol for composition is `∘` (typed `\circ` Tab). `(f ∘ g)(args...)` is `f(g(args...))`, and all the arguments go to `g` | `(iszero ∘ rem)(14, 7)` is `iszero(rem(14, 7))` → `true` |
 | `Base.Fix2(f, 7)` | a function with `7` fixed as the _second_ argument of `f`: calling it with `x` runs `f(x, 7)` | `Base.Fix2(iszero∘rem, 7)(15)` → `false` |
 
 The `2` in `Fix2` names the position that is fixed, not the number of arguments: `Base.Fix1(rem, 7)` is `x -> rem(7, x)`. The general form `Base.Fix{N}` fixes the `N`th argument, and `Base.Fix2 === Base.Fix{2}` is `true`. Any further arguments fill the remaining positions in order. `Fix2` is public but not exported, hence the `Base.` prefix.
@@ -178,13 +178,13 @@ f(14), f(15)       # (true, false)
 filter(f, 1:30)    # [7, 14, 21, 28]
 ```
 
-The plain `x -> x % 7 == 0` does the same and reads more easily. What the fancy form gains is that it shows how it is built: it prints as `Base.Fix2{ComposedFunction{typeof(iszero), typeof(rem)}, Int64}(iszero ∘ rem, 7)`, while an anonymous function prints only as a generated name such as `#2`.
+`x -> x % 7 == 0` (referred to as an _anonymous function_) does the same and reads more easily. What the fancy form gains is that it shows how it is built: it prints as `Base.Fix2{ComposedFunction{typeof(iszero), typeof(rem)}, Int64}(iszero ∘ rem, 7)`, while an anonymous function prints only as a generated name such as `#2`.
 
 #### Filtering for primes, and a faster way
 
-Verzani calls `filter(isprime, 100:200)` "an inefficient way to list the prime numbers between $100$ and $200$" without saying why. `filter` tests every number of the range on its own, and `isprime` does not use what it learned about the numbers before. How it tests one number depends on its size (`Primes` 0.5.7 source): below $2^{16}$ it looks the number up in a table of smallest factors; below $2^{32}$ it divides by the primes 3 to 23 and then runs a Miller–Rabin test; above that it runs Miller–Rabin and a Lucas test.
+Verzani calls `filter(isprime, 100:200)` "an inefficient way to list the prime numbers between $100$ and $200$" without saying why. `filter` tests every number of the range on its own, and `isprime` does not use what it learned about the numbers before. How it tests one number depends on its size (`Primes` package, 0.5.7 source): below $2^{16}$ it looks the number up in a table of smallest factors; below $2^{32}$ it divides by the primes 3 to 23 and then runs a Miller–Rabin test; above that it runs Miller–Rabin and a Lucas test.
 
-The same package has `primes(lo, hi)`, which lists the primes from `lo` to `hi` with a sieve (the source cites the Sieve of Eratosthenes and wheel factorization). A sieve crosses out the multiples of each small prime once, up to $\sqrt{hi}$, so no number is tested on its own. Both give the same list:
+The `Primes` package also has `primes(lo, hi)`, which lists the primes from `lo` to `hi` with a sieve (the source cites the Sieve of Eratosthenes and wheel factorization). A sieve crosses out the multiples of each small prime once, up to $\sqrt{hi}$, so no number is tested on its own. Both give the same list:
 
 ```julia
 using Primes
@@ -204,13 +204,13 @@ For Verzani's range the difference does not matter. It grows with the length of 
 
 #### `filter` or `if`
 
-Verzani gets the multiples of 7 both with `filter` and with an `if` in a comprehension. His note after the generator example names the difference: `filter` takes a function, while the `if` takes an expression. On a range the two give the same vector:
+Verzani gets the multiples of 7 both with `filter` and with an `if` in a comprehension. His note after the generator example shows the difference between these two approaches: `filter` takes a function, while the `if` takes an expression. On a range the two give the same vector:
 
 ```julia
 filter(k -> rem(k, 7) == 0, 1:100) == [k for k in 1:100 if rem(k, 7) == 0]    # true
 ```
 
-The difference shows when the values go straight into a reduction. `sum(filter(isprime, 1:100))` first stores the primes in a vector and then adds them, while `sum(p for p in 1:100 if isprime(p))` adds them as they come. Both give `1060`; inside a function, after a first call, the first allocates 1184 bytes and the second none. (`isprime` comes from the `Primes` package, which the Calculus notebook environment now includes.)
+The difference matters when the values go straight into a reduction. `sum(filter(isprime, 1:100))` first stores the primes in a vector and then adds them, while `sum(p for p in 1:100 if isprime(p))` adds them as they come. Both give `1060`; inside a function, after a first call, the first allocates 1184 bytes and the second none. (`isprime` comes from the `Primes` package, which the Calculus notebook environment now includes.)
 
 `filter` also does not take a generator: `filter(iseven, (x^2 for x in 1:5))` is a `MethodError`. `Iterators.filter` takes any iterable and returns another iterator, which computes nothing until it is iterated:
 
@@ -278,16 +278,16 @@ The basics are in [What a generator is](05-2 The Container Interface.md#What-a-g
 
 Verzani writes: "Not all functions allow generators as arguments, but most common reductions do." With `g = (x^2 for x in 1:5)` and the filtered `h = (x^2 for x in 1:5 if isodd(x))`:
 
-| Function | `g` | `h`, with an `if` |
-| :--- | :--- | :--- |
-| `sum`, `maximum`, `first`, `last` | `55`, `25`, `1`, `25` | `35`, `25`, `1`, `25` |
-| `collect`, `unique`, `Set`, `map(sqrt, ...)`, `sqrt.(...)` | work | work |
-| `length`, `size` | `5`, `(5,)` | `MethodError` |
-| `findfirst(iseven, ...)` | `2` | `MethodError` |
-| `sort`, `reverse`, `filter(iseven, ...)` | `MethodError` | `MethodError` |
-| indexing, `g[1]` | `MethodError` | `MethodError` |
+| Function | `g` | `h`, with an `if` | Why, and the fix |
+| :--- | :--- | :--- | :--- |
+| `sum`, `maximum`, `first`, `last` | `55`, `25`, `1`, `25` | `35`, `25`, `1`, `25` | each goes through the values once, from the first: nothing to fix |
+| `collect`, `unique`, `Set`, `map(sqrt, ...)`, `sqrt.(...)` | work | work | the same |
+| `length`, `size` | `5`, `(5,)` | `MethodError` | how many values pass the `if` is only known once they have been computed. Fix: `length(collect(h))` → `3`, or `count(Returns(true), h)` → `3`, which counts them without storing them |
+| `findfirst(iseven, ...)` | `2` | `MethodError` | `findfirst` returns a position, and `h` has no positions (`keys(h)` is a `MethodError`). Fix: `findfirst(iseven, collect(h))` → `nothing`, because none of `1`, `9`, `25` is even; `findfirst(>(5), collect(h))` → `2` |
+| `sort`, `reverse`, `filter(iseven, ...)` | `MethodError` | `MethodError` | `sort` and `reverse` need all the values at once. `filter` makes a filtered copy and has methods only for collections such as arrays, sets, dictionaries, strings and tuples. Fix: `sort(collect(g))`, `reverse(collect(g))`, `filter(iseven, collect(g))`. Without storing: `Iterators.reverse(g)` and `Iterators.filter(iseven, g)`, which work on `h` too |
+| indexing, `g[1]` | `MethodError` | `MethodError` | a generator computes its values in order and keeps none, so there is nothing to look up. Fix: `collect(g)[1]` → `1`. Without storing: `first(g)`, or `first(Iterators.drop(g, 2))` → `9` for the third value |
 
-The functions that work go through the values once, from the first. `sort` and `reverse` need all the values at once, so `collect` the generator first. The `if` costs the generator its length: how many values pass the test is only known once they have been computed. So the `length` row in the range-versus-generator table above holds only for a generator without an `if`.
+The `length` row in the range-versus-generator table above holds only for a generator without an `if`.
 
 #### Counting without storing
 
@@ -300,4 +300,4 @@ sum(1 for q = 0:25:100
       for p = (100 - q - d - n))    # 242
 ```
 
-Inside a function, after a first call, this allocates 928 bytes, and the comprehension with `length` 28208 bytes. Generators take several `for` clauses just like comprehensions, in both forms: `sum(a*b for a in 1:2 for b in 1:3)` and `sum(a*b for a in 1:2, b in 1:3)` are both `18`.
+Inside a function, after a first call, this allocates 928 bytes, and the comprehension with `length` 28208 bytes. Generators take several `for` clauses just like comprehensions, in both forms: `sum(a*b for a in 1:2 for b in 1:3)` and `sum(a*b for a in 1:2, b in 1:3)` are both `18`. The same difference as for comprehensions applies: in the comma form no range may use another clause's variable, so `sum(a*b for a in 1:3 for b in a:3)` is `25`, while `sum(a*b for a in 1:3, b in a:3)` is an `UndefVarError`. The shapes differ too: `collect(a*b for a in 1:2, b in 1:3)` is the 2×3 matrix `[1 2 3; 2 4 6]`, and `collect(a*b for a in 1:2 for b in 1:3)` the flat vector `[1, 2, 3, 2, 4, 6]`. The chained form, with `for` after `for`, has no `length` (an `ArgumentError`), because its values come from several ranges chained together.

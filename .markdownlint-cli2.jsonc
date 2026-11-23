@@ -1,0 +1,11 @@
+{
+    "ignores": [
+        ".github/copilot-instructions.md"
+    ],
+    "config": {
+        // Documenter keeps a heading's capitals in its anchor (#A-range-is-not-a-generator);
+        // markdownlint expects GitHub's lowercase ones. Compare case-insensitively, so a
+        // misspelled anchor is still caught: the docs build does not check fragments.
+        "MD051": { "ignore_case": true }
+    }
+}

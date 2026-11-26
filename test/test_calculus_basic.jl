@@ -65,7 +65,7 @@
         @variables x
         lim = symlim(log(x), x, 0; side = :right)
         @test latex_cell(lim[1]) == "-\\infty"
-        @test latex_cell(lim[2]) == "\\mathtt{:divergent\\_numeric}"
+        @test latex_cell(lim[2]) == "\\mathtt{:gruntz}"
         # symbolic results in CWJS's conventional order, not the stored one
         q = (x^2 - 1)/(x - 1)
         @test latex_cell(q) == conventional_latex(q)
